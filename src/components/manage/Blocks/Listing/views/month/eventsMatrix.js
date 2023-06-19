@@ -102,7 +102,7 @@ const isDayNewEventOld = (acc, eventStartDate, index, currentEvent) => {
 };
 
 const nextFreeIndex = (startEndDateDiff, eventsMatrixDay, eventStartDate) => {
-  const freeIndex = Array(startEndDateDiff + 1)
+  const freeIndex = Array(Math.round(startEndDateDiff) + 1)
     .fill(0)
     .reduce((highestIndex, _, index) => {
       if (
@@ -132,9 +132,10 @@ export default function eventsMatrix(events, interval) {
       (1000 * 3600 * 24);
     const diffArray =
       startEndDateDiff > 0
-        ? Array(startEndDateDiff + 1).fill(0)
+        ? Array(Math.round(startEndDateDiff) + 1).fill(0)
         : Array(1).fill(0);
     let eventStartDate = new Date(currentEvent.startDate);
+
     diffArray.map(
       (_, diffDayIndex) =>
         (acc = isDayOld(acc, eventStartDate, diffDayIndex)

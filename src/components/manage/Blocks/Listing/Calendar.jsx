@@ -38,23 +38,35 @@ const CalendarListing = ({
       return true;
     })
     .map((i) => {
+      const startDateTime = new Date(i.start);
+      const endDateTime = new Date(i.end);
+
+      const startHour = startDateTime.getHours().toString().padStart(2, '0');
+      const startMinutes = startDateTime
+        .getMinutes()
+        .toString()
+        .padStart(2, '0');
+      const endHour = endDateTime.getHours().toString().padStart(2, '0');
+      const endMinutes = endDateTime.getMinutes().toString().padStart(2, '0');
+
       return {
         title: i.title,
-        start: i.start,
-        end: i.end,
+        startDate: moment(startDateTime).format('YYYY-MM-DD'),
+        endDate: moment(endDateTime).format('YYYY-MM-DD'),
+        startHour: `${startHour}:${startMinutes}`,
+        endHour: `${endHour}:${endMinutes}`,
         url: flattenToAppURL(i['@id']),
+        id: Math.floor(Math.random() * 100),
       };
     });
-
-  console.log(normalEvents);
 
   const fetchEventsByInterval = (interval) => {
     return normalEvents.filter(
       (event) =>
-        moment(event.start).format('YYYY-MM-DD') ===
-          moment(interval.start).format('YYYY-MM-DD') &&
-        moment(event.end).format('YYYY-MM-DD') ===
-          moment(interval.end).format('YYYY-MM-DD'),
+        moment(event.startDate).format('YYYY-MM-DD') ===
+          moment(interval.startDate).format('YYYY-MM-DD') &&
+        moment(event.endDate).format('YYYY-MM-DD') ===
+          moment(interval.endDate).format('YYYY-MM-DD'),
     );
   };
 

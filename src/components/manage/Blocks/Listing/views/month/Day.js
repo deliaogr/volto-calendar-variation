@@ -211,56 +211,55 @@ const Day = ({
   return (
     <Droppable droppableId={`${dayIndex}`} key={`key-drop-${dayIndex}`}>
       {(provided) => (
-        <div>Day</div>
-        // <section
-        //   key={`section-${dayIndex}`}
-        //   className={dayOfTheMonth.class}
-        //   {...provided.droppableProps}
-        //   ref={provided.innerRef}
-        // >
-        //   <div key={`key-${dayIndex}`}>
-        //     <div
-        //       key={`key-div-${dayIndex}`}
-        //       onClick={() => {
-        //         handleCreate(
-        //           dayOfTheMonth.year,
-        //           dayOfTheMonth.month - 1,
-        //           dayOfTheMonth.dayNumber,
-        //         );
-        //       }}
-        //     >
-        //       {displayDay(dayOfTheMonth)}
-        //       {provided.placeholder}
-        //     </div>
-        //     {eventsList.length < 4 ? (
-        //       eventsList
-        //     ) : (
-        //       <>
-        //         {/* show only the first three events */}
-        //         {eventsList.slice(0, 3)}
-        //         <button
-        //           className="see-more-btn"
-        //           key={`key-btn-${dayIndex}`}
-        //           onClick={togglePopup}
-        //         >
-        //           + see more
-        //         </button>
-        //         {isOpen && (
-        //           <Popup
-        //             {...{
-        //               events: Object.values(eventsMatrix[date]),
-        //               setIsOpen: togglePopup,
-        //               monthForPopUp: dayOfTheMonth.month,
-        //               dayForPopUp: dayOfTheMonth.dayNumber,
-        //               yearForPopUp: dayOfTheMonth.year,
-        //               handleEdit,
-        //             }}
-        //           />
-        //         )}
-        //       </>
-        //     )}
-        //   </div>
-        // </section>
+        <section
+          key={`section-${dayIndex}`}
+          className={dayOfTheMonth.class}
+          {...provided.droppableProps}
+          ref={provided.innerRef}
+        >
+          <div key={`key-${dayIndex}`}>
+            <div
+              key={`key-div-${dayIndex}`}
+              onClick={() => {
+                handleCreate(
+                  dayOfTheMonth.year,
+                  dayOfTheMonth.month - 1,
+                  dayOfTheMonth.dayNumber,
+                );
+              }}
+            >
+              {displayDay(dayOfTheMonth)}
+              {provided.placeholder}
+            </div>
+            {eventsList.length < 4 ? (
+              eventsList
+            ) : (
+              <>
+                {/* show only the first three events */}
+                {eventsList.slice(0, 3)}
+                <button
+                  className="see-more-btn"
+                  key={`key-btn-${dayIndex}`}
+                  onClick={togglePopup}
+                >
+                  + see more
+                </button>
+                {/* {isOpen && (
+                    <Popup
+                      {...{
+                        events: Object.values(eventsMatrix[date]),
+                        setIsOpen: togglePopup,
+                        monthForPopUp: dayOfTheMonth.month,
+                        dayForPopUp: dayOfTheMonth.dayNumber,
+                        yearForPopUp: dayOfTheMonth.year,
+                        handleEdit,
+                      }}
+                    />
+                  )} */}
+              </>
+            )}
+          </div>
+        </section>
       )}
     </Droppable>
   );

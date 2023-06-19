@@ -29,33 +29,32 @@ const Month = ({
   );
   const [allEvents, setAllEvents] = useState([]);
 
-  // useEffect(() => {
-  //   const selectedInterval = makeIntervalToFetchMonthEvents(
-  //     selectedMonth,
-  //     selectedYear,
-  //     allEvents,
-  //   );
+  useEffect(() => {
+    const selectedInterval = makeIntervalToFetchMonthEvents(
+      selectedMonth,
+      selectedYear,
+      allEvents,
+    );
 
-  //   const relevantRecursiveEvents = recursiveEvents.filter((event) =>
-  //     recursiveEventsInInterval(event, selectedInterval),
-  //   );
+    const relevantRecursiveEvents = recursiveEvents.filter((event) =>
+      recursiveEventsInInterval(event, selectedInterval),
+    );
 
-  //   const allRecursiveEvents = relevantRecursiveEvents.reduce(
-  //     (acc, currentEvent) => {
-  //       return [
-  //         ...acc,
-  //         ...recursiveFunctions[currentEvent.recursive](
-  //           currentEvent,
-  //           selectedInterval,
-  //         ),
-  //       ];
-  //     },
-  //     [],
-  //   );
+    const allRecursiveEvents = relevantRecursiveEvents.reduce(
+      (acc, currentEvent) => {
+        return [
+          ...acc,
+          ...recursiveFunctions[currentEvent.recursive](
+            currentEvent,
+            selectedInterval,
+          ),
+        ];
+      },
+      [],
+    );
 
-  //   setAllEvents([...normalEvents, ...allRecursiveEvents]);
-  //   setAllEvents(normalEvents);
-  // }, [normalEvents, recursiveEvents]);
+    setAllEvents([...normalEvents, ...allRecursiveEvents]);
+  }, [normalEvents, recursiveEvents]);
 
   const updateEventDatesMonthView = (
     eventToMove,
@@ -185,7 +184,7 @@ const Month = ({
 
   const handleCreate = (year, month, day) => {
     makeDefaultEvent(makeInterval(year, month, day, year, month, day));
-    handleOpenModal();
+    // handleOpenModal();
   };
 
   const displayMonth = (
@@ -214,15 +213,15 @@ const Month = ({
   //   );
   // }, []);
 
-  // useEffect(() => {
-  //   setDaysOfTheMonth(
-  //     fillCalendarDays(selectedMonth.key, allEvents, selectedYear),
-  //   );
-  // }, [allEvents, selectedMonth.key, selectedYear]);
+  useEffect(() => {
+    setDaysOfTheMonth(
+      fillCalendarDays(selectedMonth.key, allEvents, selectedYear),
+    );
+  }, [allEvents, selectedMonth.key, selectedYear]);
 
-  // useEffect(() => {
-  //   setEventsMatrixState(eventsMatrix(allEvents));
-  // }, [allEvents]);
+  useEffect(() => {
+    setEventsMatrixState(eventsMatrix(allEvents));
+  }, [allEvents]);
 
   return (
     <div>

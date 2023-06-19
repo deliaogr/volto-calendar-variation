@@ -26,35 +26,35 @@ const Week = ({
 }) => {
   const [allEvents, setAllEvents] = useState([]);
 
-  // useEffect(() => {
-  //   const selectedInterval = makeInterval(
-  //     new Date(firstDayOfCurrentWeek).getFullYear(),
-  //     new Date(firstDayOfCurrentWeek).getMonth(),
-  //     new Date(firstDayOfCurrentWeek).getDate(),
-  //     new Date(lastDayOfCurrentWeek).getFullYear(),
-  //     new Date(lastDayOfCurrentWeek).getMonth(),
-  //     new Date(lastDayOfCurrentWeek).getDate(),
-  //   );
-  //   const relevantRecursiveEvents = recursiveEvents.filter((event) =>
-  //     recursiveEventsInInterval(event, selectedInterval),
-  //   );
+  useEffect(() => {
+    const selectedInterval = makeInterval(
+      new Date(firstDayOfCurrentWeek).getFullYear(),
+      new Date(firstDayOfCurrentWeek).getMonth(),
+      new Date(firstDayOfCurrentWeek).getDate(),
+      new Date(lastDayOfCurrentWeek).getFullYear(),
+      new Date(lastDayOfCurrentWeek).getMonth(),
+      new Date(lastDayOfCurrentWeek).getDate(),
+    );
 
-  //   const allRecursiveEvents = relevantRecursiveEvents.reduce(
-  //     (acc, currentEvent) => {
-  //       return [
-  //         ...acc,
-  //         ...recursiveFunctions[currentEvent.recursive](
-  //           currentEvent,
-  //           selectedInterval,
-  //         ),
-  //       ];
-  //     },
-  //     [],
-  //   );
+    const relevantRecursiveEvents = recursiveEvents.filter((event) =>
+      recursiveEventsInInterval(event, selectedInterval),
+    );
 
-  //   setAllEvents([...normalEvents, ...allRecursiveEvents]);
-  //   setAllEvents(normalEvents);
-  // }, [normalEvents, recursiveEvents]);
+    const allRecursiveEvents = relevantRecursiveEvents.reduce(
+      (acc, currentEvent) => {
+        return [
+          ...acc,
+          ...recursiveFunctions[currentEvent.recursive](
+            currentEvent,
+            selectedInterval,
+          ),
+        ];
+      },
+      [],
+    );
+
+    setAllEvents([...normalEvents, ...allRecursiveEvents]);
+  }, [normalEvents, recursiveEvents]);
 
   const fullDayEvents = allEvents.filter((event) => event.startHour === null);
 
@@ -233,22 +233,22 @@ const Week = ({
   //   );
   // }, []);
 
-  // useEffect(() => {
-  //   setWeekHours(
-  //     fillCalendarDays(
-  //       allEvents,
-  //       firstAndLastDayOfTheWeek(
-  //         new Date(
-  //           `${selectedWeek.startYear}/${selectedWeek.startMonth}/${selectedWeek.startDay}`,
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }, [allEvents, selectedWeek]);
+  useEffect(() => {
+    setWeekHours(
+      fillCalendarDays(
+        allEvents,
+        firstAndLastDayOfTheWeek(
+          new Date(
+            `${selectedWeek.startYear}/${selectedWeek.startMonth}/${selectedWeek.startDay}`,
+          ),
+        ),
+      ),
+    );
+  }, [allEvents, selectedWeek]);
 
-  // useEffect(() => {
-  //   setEventsMatrixState(eventsMatrix(allEvents));
-  // }, [allEvents]);
+  useEffect(() => {
+    setEventsMatrixState(eventsMatrix(allEvents));
+  }, [allEvents]);
 
   return (
     <div>

@@ -117,30 +117,29 @@ const Hour = ({
               index={indexEvent}
             >
               {(provided) => (
-                <div>Hour 1</div>
-                // <section
-                //   key={`key-ev-${index}`}
-                //   onClick={() => {
-                //     handleEdit(
-                //       weekEventsMatrix[date][index].id,
-                //       weekEventsMatrix[date][index].recursive,
-                //     );
-                //   }}
-                //   ref={provided.innerRef}
-                //   {...provided.draggableProps}
-                //   {...provided.dragHandleProps}
-                // >
-                //   <div
-                //     className={eventStyle(weekEventsMatrix[date][index])}
-                //     style={{
-                //       width: `${makeEventWidth(
-                //         weekEventsMatrix[date][index],
-                //       )}%`,
-                //     }}
-                //   >
-                //     {displayHourAndEventTitle(weekEventsMatrix[date][index])}
-                //   </div>
-                // </section>
+                <section
+                  key={`key-ev-${index}`}
+                  onClick={() => {
+                    handleEdit(
+                      weekEventsMatrix[date][index].id,
+                      weekEventsMatrix[date][index].recursive,
+                    );
+                  }}
+                  ref={provided.innerRef}
+                  {...provided.draggableProps}
+                  {...provided.dragHandleProps}
+                >
+                  <div
+                    className={eventStyle(weekEventsMatrix[date][index])}
+                    style={{
+                      width: `${makeEventWidth(
+                        weekEventsMatrix[date][index],
+                      )}%`,
+                    }}
+                  >
+                    {displayHourAndEventTitle(weekEventsMatrix[date][index])}
+                  </div>
+                </section>
               )}
             </Draggable>
           ) : (
@@ -156,46 +155,44 @@ const Hour = ({
     hour.hour < 0 ? (
       <Droppable droppableId={`${hourIndex}`}>
         {(provided) => (
-          <div>Hour 2</div>
-          // <div
-          //   className="dayWeekView"
-          //   {...provided.droppableProps}
-          //   ref={provided.innerRef}
-          //   onClick={() => {
-          //     handleCreate(
-          //       hour.year,
-          //       hour.month - 1,
-          //       hour.dayNumber,
-          //       hour.hour,
-          //     );
-          //   }}
-          // >
-          //   <div>{provided.placeholder}</div>
-          //   {eventsListWithoutHour}
-          // </div>
+          <div
+            className="dayWeekView"
+            {...provided.droppableProps}
+            ref={provided.innerRef}
+            onClick={() => {
+              handleCreate(
+                hour.year,
+                hour.month - 1,
+                hour.dayNumber,
+                hour.hour,
+              );
+            }}
+          >
+            <div>{provided.placeholder}</div>
+            {eventsListWithoutHour}
+          </div>
         )}
       </Droppable>
     ) : (
       <section key={hourIndex}>
         <Droppable droppableId={`${hourIndex}`}>
           {(provided) => (
-            <div>Hour 3</div>
-            // <div
-            //   className="dayWeekView"
-            //   {...provided.droppableProps}
-            //   ref={provided.innerRef}
-            //   onClick={() => {
-            //     handleCreate(
-            //       hour.year,
-            //       hour.month - 1,
-            //       hour.dayNumber,
-            //       hour.hour,
-            //     );
-            //   }}
-            // >
-            //   <div>{provided.placeholder}</div>
-            //   {eventsListWithHour}
-            // </div>
+            <div
+              className="dayWeekView"
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+              onClick={() => {
+                handleCreate(
+                  hour.year,
+                  hour.month - 1,
+                  hour.dayNumber,
+                  hour.hour,
+                );
+              }}
+            >
+              <div>{provided.placeholder}</div>
+              {eventsListWithHour}
+            </div>
           )}
         </Droppable>
       </section>
