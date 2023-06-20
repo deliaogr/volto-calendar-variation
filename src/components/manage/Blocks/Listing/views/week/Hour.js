@@ -10,6 +10,7 @@ const Hour = ({
   handleEdit,
   eventsMatrix,
   weekEventsMatrix,
+  isEditMode,
 }) => {
   const date = moment(`${hour.year}, ${hour.month}, ${hour.dayNumber}`).format(
     'YYYY-MM-DD',
@@ -66,6 +67,7 @@ const Hour = ({
               key={`key-${index}`}
               draggableId={`day-${eventsMatrix[date][index].id}`}
               index={indexEvent}
+              isDragDisabled={isEditMode ? false : true}
             >
               {(provided) => (
                 <section
@@ -115,6 +117,7 @@ const Hour = ({
               key={`key-${index}`}
               draggableId={`day-${weekEventsMatrix[date][index].id}`}
               index={indexEvent}
+              isDragDisabled={isEditMode ? false : true}
             >
               {(provided) => (
                 <section

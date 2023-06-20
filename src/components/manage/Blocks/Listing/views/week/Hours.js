@@ -7,6 +7,7 @@ const Hours = ({
   handleEdit,
   eventsMatrix,
   weekEventsMatrix,
+  isEditMode,
 }) => {
   return weekHours.map((hour, hourIndex) => (
     <Hour
@@ -17,6 +18,7 @@ const Hours = ({
         handleEdit,
         eventsMatrix,
         weekEventsMatrix,
+        isEditMode,
       }}
       key={hourIndex}
     />

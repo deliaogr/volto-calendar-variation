@@ -4,7 +4,7 @@ const getViewChoices = (intl) => {
   return [
     ['monthTable', intl.formatMessage(messages.labelMonthTable)],
     ['weekTable', intl.formatMessage(messages.labelWeekTable)],
-    ['dayTable', intl.formatMessage(messages.labelDayTable)],
+    // ['dayTable', intl.formatMessage(messages.labelDayTable)],
   ];
 };
 
@@ -18,7 +18,12 @@ const CalendarBlockSchema = (intl) => {
       {
         id: 'default',
         title: 'Default',
-        fields: ['calendar_url', 'initial_view', 'initial_date'],
+        fields: [
+          'calendar_url',
+          'initial_view',
+          'initial_date',
+          'user_select_view',
+        ],
       },
     ],
 
@@ -27,6 +32,11 @@ const CalendarBlockSchema = (intl) => {
         title: intl.formatMessage(messages.labelCalendarURL),
         description: intl.formatMessage(messages.descriptionCalendarURL),
         type: 'string',
+      },
+      user_select_view: {
+        title: intl.formatMessage(messages.labelUserSelectView),
+        type: 'boolean',
+        default: 'false',
       },
       initial_view: {
         title: intl.formatMessage(messages.labelInitialView),

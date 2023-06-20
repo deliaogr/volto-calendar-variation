@@ -7,7 +7,7 @@
   display: grid;
   width: 100%;
   grid-template-rows: auto;
-  /* overflow: auto; */
+  overflow: auto;
   justify-items: start;
   padding: 0 30px;
 }
@@ -175,6 +175,7 @@
   position: relative;
   padding-left: 8px;
   padding-top: 5px;
+  width: 100%;
 }
 .dayWeekView {
   min-height: 60px;

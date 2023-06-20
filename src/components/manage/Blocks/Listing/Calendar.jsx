@@ -17,15 +17,11 @@ const CalendarListing = ({
   //   makeDefaultEvent,
   //   editEventData,
   items,
+  isEditMode,
 }) => {
   const [selectedView, setSelectedView] = useState(INITIAL_VIEW);
   let defaultEvent = {};
   const View = views[selectedView];
-
-  const handleEdit = (eventId) => {
-    getCurrentEventById(eventId);
-    // handleOpenModal();
-  };
 
   const normalEvents = items
     .filter((i) => {
@@ -70,8 +66,26 @@ const CalendarListing = ({
     );
   };
 
+  const editEventData = (eventData) => {
+    // editEvent({
+    //   title: eventData.title,
+    //   startDate: eventData.startDate,
+    //   endDate: eventData.endDate,
+    //   id: eventData.id,
+    //   startHour: eventData.startHour ? eventData.startHour : null,
+    //   endHour: eventData.endHour ? eventData.endHour : null,
+    //   recursive: eventData.recursive,
+    // });
+    console.log('event moved');
+  };
+
   const getCurrentEventById = (eventId) => {
     return normalEvents[eventId];
+  };
+
+  const handleEdit = (eventId) => {
+    getCurrentEventById(eventId);
+    // handleOpenModal();
   };
 
   const makeDefaultEvent = (interval) =>
@@ -88,13 +102,14 @@ const CalendarListing = ({
           viewNames,
           setSelectedView,
           // ModalPopUp,
-          // handleEdit,
+          handleEdit,
           normalEvents,
           recursiveEvents,
-          // fetchEventsByInterval,
-          // editEventData,
+          fetchEventsByInterval,
+          editEventData,
           // handleOpenModal,
           makeDefaultEvent,
+          isEditMode,
         }}
       />
     </div>

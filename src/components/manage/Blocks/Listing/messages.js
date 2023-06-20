@@ -17,6 +17,10 @@ const messages = defineMessages({
     id: 'Must point to an iCal/ics file.',
     defaultMessage: 'Must point to an iCal/ics file.',
   },
+  labelUserSelectView: {
+    id: 'User can select calendar view',
+    defaultMessage: 'User can select calendar view',
+  },
   labelMonthTable: {
     id: 'Month',
     defaultMessage: 'Month',

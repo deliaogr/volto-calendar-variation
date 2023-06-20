@@ -23,6 +23,7 @@ const Week = ({
   editEventData,
   handleOpenModal,
   makeDefaultEvent,
+  isEditMode,
 }) => {
   const [allEvents, setAllEvents] = useState([]);
 
@@ -155,16 +156,16 @@ const Week = ({
 
   const onChangeWeek = (firstDay, lastDay) => {
     setSelectedWeek(firstAndLastDayOfTheWeek(firstDay));
-    // fetchEventsByInterval(
-    //   makeInterval(
-    //     new Date(firstDay).getFullYear(),
-    //     new Date(firstDay).getMonth(),
-    //     new Date(firstDay).getDate(),
-    //     new Date(lastDay).getFullYear(),
-    //     new Date(lastDay).getMonth(),
-    //     new Date(lastDay).getDate(),
-    //   ),
-    // );
+    fetchEventsByInterval(
+      makeInterval(
+        new Date(firstDay).getFullYear(),
+        new Date(firstDay).getMonth(),
+        new Date(firstDay).getDate(),
+        new Date(lastDay).getFullYear(),
+        new Date(lastDay).getMonth(),
+        new Date(lastDay).getDate(),
+      ),
+    );
   };
 
   const handleChangePreviousWeek = () => {
@@ -203,7 +204,7 @@ const Week = ({
       ...makeInterval(year, month, day, year, month, day),
       startHour: moment(startHour, 'HH:mm'),
     });
-    handleOpenModal();
+    // handleOpenModal();
   };
 
   const displayWeeks = (selectedWeek) => {
@@ -220,18 +221,18 @@ const Week = ({
     return result;
   };
 
-  // useEffect(() => {
-  //   fetchEventsByInterval(
-  //     makeInterval(
-  //       selectedWeek.startYear,
-  //       selectedWeek.startMonth - 1,
-  //       selectedWeek.startDay,
-  //       selectedWeek.endYear,
-  //       selectedWeek.endMonth - 1,
-  //       selectedWeek.endDay,
-  //     ),
-  //   );
-  // }, []);
+  useEffect(() => {
+    fetchEventsByInterval(
+      makeInterval(
+        selectedWeek.startYear,
+        selectedWeek.startMonth - 1,
+        selectedWeek.startDay,
+        selectedWeek.endYear,
+        selectedWeek.endMonth - 1,
+        selectedWeek.endDay,
+      ),
+    );
+  }, []);
 
   useEffect(() => {
     setWeekHours(
@@ -252,7 +253,10 @@ const Week = ({
 
   return (
     <div>
-      <DragDropContext onDragEnd={onDragEndWeekView}>
+      <DragDropContext
+        onDragEnd={onDragEndWeekView}
+        enableDefaultSensors={isEditMode ? true : false}
+      >
         <div className="calendar-container">
           <ViewSelector
             {...{ selectedView: 'Week', viewNames, setSelectedView }}
@@ -272,6 +276,7 @@ const Week = ({
                   handleEdit,
                   eventsMatrix: eventsMatrix(fullDayEvents),
                   weekEventsMatrix: eventsMatrix(hourEvents),
+                  isEditMode,
                 }}
               />
             </div>

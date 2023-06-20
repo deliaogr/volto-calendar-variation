@@ -22,6 +22,7 @@ const Month = ({
   editEventData,
   handleOpenModal,
   makeDefaultEvent,
+  isEditMode,
 }) => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setCurrentMonth] = useState(
@@ -159,9 +160,9 @@ const Month = ({
 
   const onChangeMonth = (monthSelection, year) => {
     setCurrentMonth(monthSelection);
-    // fetchEventsByInterval(
-    //   makeIntervalToFetchMonthEvents(monthSelection, year, []),
-    // );
+    fetchEventsByInterval(
+      makeIntervalToFetchMonthEvents(monthSelection, year, []),
+    );
   };
 
   const handleChangePreviousMonth = () => {
@@ -207,11 +208,11 @@ const Month = ({
     </div>
   );
 
-  // useEffect(() => {
-  //   fetchEventsByInterval(
-  //     makeIntervalToFetchMonthEvents(selectedMonth, selectedYear, []),
-  //   );
-  // }, []);
+  useEffect(() => {
+    fetchEventsByInterval(
+      makeIntervalToFetchMonthEvents(selectedMonth, selectedYear, []),
+    );
+  }, []);
 
   useEffect(() => {
     setDaysOfTheMonth(
@@ -225,7 +226,10 @@ const Month = ({
 
   return (
     <div>
-      <DragDropContext onDragEnd={onDragEndMonthView}>
+      <DragDropContext
+        onDragEnd={onDragEndMonthView}
+        enableDefaultSensors={isEditMode ? true : false}
+      >
         <div className="calendar-container">
           <ViewSelector
             {...{ selectedView: 'Month', viewNames, setSelectedView }}
@@ -243,6 +247,7 @@ const Month = ({
                 handleCreate,
                 handleEdit,
                 eventsMatrix: eventsMatrixState,
+                isEditMode,
               }}
             />
           </div>

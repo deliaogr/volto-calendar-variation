@@ -10,6 +10,7 @@ const Day = ({
   handleCreate,
   handleEdit,
   eventsMatrix,
+  isEditMode,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -98,6 +99,7 @@ const Day = ({
               key={`key-${index}`}
               draggableId={`day-${eventsMatrix[date][index].id}-${date}`}
               index={indexEvent}
+              isDragDisabled={isEditMode ? false : true}
             >
               {(provided) => (
                 // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
