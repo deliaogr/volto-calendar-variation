@@ -1,7 +1,25 @@
-import { CalendarListing } from './components';
-import CalendarBlockSchema from './components/manage/Blocks/Listing/schema';
+import calendarSVG from '@plone/volto/icons/calendar.svg';
+import { CalendarListing, CalendarView, CalendarEdit } from './components';
+import CalendarBlockSchema from './components/manage/Blocks/Calendar/schema';
 
 const applyConfig = (config) => {
+  config.blocks.blocksConfig.calendar = {
+    id: 'calendar',
+    title: 'Calendar',
+    icon: calendarSVG,
+    group: 'common',
+    view: CalendarView,
+    edit: CalendarEdit,
+    restricted: false,
+    mostUsed: false,
+    blockHasOwnFocusManagement: false,
+    sidebarTab: 1,
+    security: {
+      addPermission: [],
+      view: [],
+    },
+  };
+
   config.blocks.blocksConfig.listing.variations = [
     ...config.blocks.blocksConfig.listing.variations,
     {

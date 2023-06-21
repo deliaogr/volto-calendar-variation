@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import './coursesCalendar.css';
-import * as views from './views';
+import '../Calendar/coursesCalendar.css';
+import * as views from '../Calendar/views';
 import moment from 'moment';
-import { INITIAL_VIEW } from './constants';
+import { INITIAL_VIEW } from '../Calendar/constants';
 import { flattenToAppURL } from '@plone/volto/helpers';
 
 const viewNames = Object.keys(views);
@@ -45,12 +45,20 @@ const CalendarListing = ({
       const endHour = endDateTime.getHours().toString().padStart(2, '0');
       const endMinutes = endDateTime.getMinutes().toString().padStart(2, '0');
 
+      const isFullDayEvent =
+        startHour === '01' &&
+        startMinutes === '00' &&
+        endHour === '00' &&
+        endMinutes === '59'
+          ? true
+          : false;
+
       return {
         title: i.title,
         startDate: moment(startDateTime).format('YYYY-MM-DD'),
         endDate: moment(endDateTime).format('YYYY-MM-DD'),
-        startHour: `${startHour}:${startMinutes}`,
-        endHour: `${endHour}:${endMinutes}`,
+        startHour: isFullDayEvent ? null : `${startHour}:${startMinutes}`,
+        endHour: isFullDayEvent ? null : `${endHour}:${endMinutes}`,
         url: flattenToAppURL(i['@id']),
         id: Math.floor(Math.random() * 100),
       };
