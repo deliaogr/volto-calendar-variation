@@ -52,6 +52,10 @@ export const recursiveEventsInInterval = (event, selectedInterval) => {
         ? new Date(selectedInterval.startDate).getFullYear() + 1
         : new Date(selectedInterval.startDate).getFullYear();
     eventStartDate.setFullYear(intervalYear);
+  } else if (event.recursive === 'daily') {
+  } else if (event.recursive === 'hourly') {
+  } else if (event.recursive === 'minutely') {
+  } else if (event.recursive === 'secondly') {
   }
 
   return (

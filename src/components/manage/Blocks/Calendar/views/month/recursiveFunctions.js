@@ -46,18 +46,20 @@ export const recursiveFunctions = {
       currentEvent,
       selectedInterval,
     );
+
     const generatedRecursiveEvents = [];
+
     eventStartDate.setTime(eventStartDate.getTime());
     eventEndDate.setTime(
       eventStartDate.getTime() +
         startDateEndDateDiff(currentEvent) * 24 * 3600 * 1000,
     );
+
     generatedRecursiveEvents.push({
       ...currentEvent,
       startDate: moment(eventStartDate).format('YYYY-MM-DD'),
       endDate: moment(eventEndDate).format('YYYY-MM-DD'),
     });
-    // let isWithinInterval;
 
     do {
       eventStartDate.setTime(eventStartDate.getTime() + 7 * 24 * 3600 * 1000);
@@ -67,36 +69,25 @@ export const recursiveFunctions = {
         eventStartDate.getTime() +
           startDateEndDateDiff(currentEvent) * 24 * 3600 * 1000,
       );
+
       generatedRecursiveEvents.push({
         ...currentEvent,
         startDate: moment(eventStartDate).format('YYYY-MM-DD'),
         endDate: moment(eventEndDate).format('YYYY-MM-DD'),
       });
-      // if (currentEvent.endDateRecursive) {
-      //   isWithinInterval =
-      //     new Date(selectedInterval.startDate).getTime() <
-      //       new Date(currentEvent.endDateRecursive).getTime() &&
-      //     new Date(currentEvent.endDateRecursive).getTime() <
-      //       new Date(selectedInterval.endDate).getTime();
-      // } else {
-      //   isWithinInterval =
-      //     new Date(selectedInterval.startDate).getTime() <
-      //       new Date(eventStartDate).getTime() &&
-      //     new Date(eventStartDate).getTime() <
-      //       new Date(selectedInterval.endDate).getTime();
-      // }
     } while (
       new Date(selectedInterval.startDate).getTime() <
         new Date(eventStartDate).getTime() &&
       new Date(eventStartDate).getTime() <
         new Date(selectedInterval.endDate).getTime()
-      // isWithinInterval
     );
     return generatedRecursiveEvents;
   },
+
   monthly(currentEvent, selectedInterval) {
     const eventStartDate = new Date(currentEvent.startDate);
     const eventEndDate = new Date(currentEvent.endDate);
+
     const intervalStartDate = new Date(selectedInterval.startDate);
     const intervalMonthAndYear =
       intervalStartDate.getDate() === 1
@@ -110,6 +101,7 @@ export const recursiveFunctions = {
             month: intervalStartDate.getMonth() + 1,
             year: intervalStartDate.getFullYear(),
           };
+
     eventStartDate.setMonth(intervalMonthAndYear.month);
     eventStartDate.setFullYear(intervalMonthAndYear.year);
 
@@ -125,6 +117,7 @@ export const recursiveFunctions = {
       },
     ];
   },
+
   annually(currentEvent, selectedInterval) {
     const eventStartDate = new Date(currentEvent.startDate);
     const eventEndDate = new Date(currentEvent.endDate);
@@ -151,5 +144,171 @@ export const recursiveFunctions = {
         endDate: moment(eventEndDate).format('YYYY-MM-DD'),
       },
     ];
+  },
+
+  daily(currentEvent, selectedInterval) {
+    const { eventStartDate, eventEndDate } = makeStartDate(
+      currentEvent,
+      selectedInterval,
+    );
+
+    const generatedRecursiveEvents = [];
+
+    eventStartDate.setTime(eventStartDate.getTime());
+    eventEndDate.setTime(
+      eventStartDate.getTime() +
+        startDateEndDateDiff(currentEvent) * 24 * 3600 * 1000,
+    );
+
+    generatedRecursiveEvents.push({
+      ...currentEvent,
+      startDate: moment(eventStartDate).format('YYYY-MM-DD HH:mm:ss'),
+      endDate: moment(eventEndDate).format('YYYY-MM-DD HH:mm:ss'),
+    });
+
+    do {
+      eventStartDate.setTime(eventStartDate.getTime() + 24 * 3600 * 1000);
+      // By default, the time is set to 00:00, but in the last weekend of every october the clocks are set back one hour (and that would put the events on the previous day, if we don't change the default hour)
+      eventStartDate.setHours(1, 0, 0, 0);
+      eventEndDate.setTime(
+        eventStartDate.getTime() +
+          startDateEndDateDiff(currentEvent) * 24 * 3600 * 1000,
+      );
+
+      generatedRecursiveEvents.push({
+        ...currentEvent,
+        startDate: moment(eventStartDate).format('YYYY-MM-DD HH:mm:ss'),
+        endDate: moment(eventEndDate).format('YYYY-MM-DD HH:mm:ss'),
+      });
+    } while (
+      new Date(selectedInterval.startDate).getTime() <
+        new Date(eventStartDate).getTime() &&
+      new Date(eventStartDate).getTime() <
+        new Date(selectedInterval.endDate).getTime()
+    );
+    return generatedRecursiveEvents;
+  },
+
+  hourly(currentEvent, selectedInterval) {
+    const { eventStartDate, eventEndDate } = makeStartDate(
+      currentEvent,
+      selectedInterval,
+    );
+
+    const generatedRecursiveEvents = [];
+
+    eventStartDate.setTime(eventStartDate.getTime());
+    eventEndDate.setTime(
+      eventStartDate.getTime() +
+        startDateEndDateDiff(currentEvent) * 3600 * 1000,
+    );
+
+    generatedRecursiveEvents.push({
+      ...currentEvent,
+      startDate: moment(eventStartDate).format('YYYY-MM-DD HH:mm:ss'),
+      endDate: moment(eventEndDate).format('YYYY-MM-DD HH:mm:ss'),
+    });
+
+    do {
+      eventStartDate.setTime(eventStartDate.getTime() + 3600 * 1000);
+      eventEndDate.setTime(
+        eventStartDate.getTime() +
+          startDateEndDateDiff(currentEvent) * 3600 * 1000,
+      );
+
+      generatedRecursiveEvents.push({
+        ...currentEvent,
+        startDate: moment(eventStartDate).format('YYYY-MM-DD HH:mm:ss'),
+        endDate: moment(eventEndDate).format('YYYY-MM-DD HH:mm:ss'),
+      });
+    } while (
+      new Date(selectedInterval.startDate).getTime() <
+        new Date(eventStartDate).getTime() &&
+      new Date(eventStartDate).getTime() <
+        new Date(selectedInterval.endDate).getTime()
+    );
+
+    return generatedRecursiveEvents;
+  },
+
+  minutely(currentEvent, selectedInterval) {
+    const { eventStartDate, eventEndDate } = makeStartDate(
+      currentEvent,
+      selectedInterval,
+    );
+
+    const generatedRecursiveEvents = [];
+
+    eventStartDate.setTime(eventStartDate.getTime());
+    eventEndDate.setTime(
+      eventStartDate.getTime() + startDateEndDateDiff(currentEvent) * 60 * 1000,
+    );
+
+    generatedRecursiveEvents.push({
+      ...currentEvent,
+      startDate: moment(eventStartDate).format('YYYY-MM-DD HH:mm:ss'),
+      endDate: moment(eventEndDate).format('YYYY-MM-DD HH:mm:ss'),
+    });
+
+    do {
+      eventStartDate.setTime(eventStartDate.getTime() + 60 * 1000);
+      eventEndDate.setTime(
+        eventStartDate.getTime() +
+          startDateEndDateDiff(currentEvent) * 60 * 1000,
+      );
+
+      generatedRecursiveEvents.push({
+        ...currentEvent,
+        startDate: moment(eventStartDate).format('YYYY-MM-DD HH:mm:ss'),
+        endDate: moment(eventEndDate).format('YYYY-MM-DD HH:mm:ss'),
+      });
+    } while (
+      new Date(selectedInterval.startDate).getTime() <
+        new Date(eventStartDate).getTime() &&
+      new Date(eventStartDate).getTime() <
+        new Date(selectedInterval.endDate).getTime()
+    );
+
+    return generatedRecursiveEvents;
+  },
+
+  secondly(currentEvent, selectedInterval) {
+    const { eventStartDate, eventEndDate } = makeStartDate(
+      currentEvent,
+      selectedInterval,
+    );
+
+    const generatedRecursiveEvents = [];
+
+    eventStartDate.setTime(eventStartDate.getTime());
+    eventEndDate.setTime(
+      eventStartDate.getTime() + startDateEndDateDiff(currentEvent) * 1000,
+    );
+
+    generatedRecursiveEvents.push({
+      ...currentEvent,
+      startDate: moment(eventStartDate).format('YYYY-MM-DD HH:mm:ss'),
+      endDate: moment(eventEndDate).format('YYYY-MM-DD HH:mm:ss'),
+    });
+
+    do {
+      eventStartDate.setTime(eventStartDate.getTime() + 1000);
+      eventEndDate.setTime(
+        eventStartDate.getTime() + startDateEndDateDiff(currentEvent) * 1000,
+      );
+
+      generatedRecursiveEvents.push({
+        ...currentEvent,
+        startDate: moment(eventStartDate).format('YYYY-MM-DD HH:mm:ss'),
+        endDate: moment(eventEndDate).format('YYYY-MM-DD HH:mm:ss'),
+      });
+    } while (
+      new Date(selectedInterval.startDate).getTime() <
+        new Date(eventStartDate).getTime() &&
+      new Date(eventStartDate).getTime() <
+        new Date(selectedInterval.endDate).getTime()
+    );
+
+    return generatedRecursiveEvents;
   },
 };

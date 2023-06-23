@@ -4,12 +4,50 @@ import * as views from '../Calendar/views';
 import moment from 'moment';
 import { INITIAL_VIEW } from '../Calendar/constants';
 import { flattenToAppURL } from '@plone/volto/helpers';
+import { RRule, rrulestr } from 'rrule';
 
 const viewNames = Object.keys(views);
 
+const expand = (item) => {
+  let recurrence = item.recurrence;
+  if (item.recurrence.indexOf('DTSTART') < 0) {
+    var dtstart = RRule.optionsToString({
+      dtstart: new Date(item.start),
+    });
+    recurrence = dtstart + '\n' + recurrence;
+  }
+
+  const rrule = rrulestr(recurrence, { unfold: true, forceset: true });
+
+  const startDateTime = new Date(rrule.options.dtstart);
+
+  const startHour = startDateTime.getHours().toString().padStart(2, '0');
+  const startMinutes = startDateTime.getMinutes().toString().padStart(2, '0');
+
+  const isFullDayEvent =
+    startHour === '01' && startMinutes === '00' ? true : false;
+
+  const freqIndex = recurrence.indexOf('FREQ=');
+  const semicolonIndex = recurrence.indexOf(';', freqIndex);
+  const freqValue = recurrence.substring(freqIndex + 5, semicolonIndex);
+
+  return {
+    title: item.title,
+    startDate: moment(rrule.options.dtstart).format('YYYY-MM-DD'),
+    endDate: null,
+    url: flattenToAppURL(item['@id']),
+    // endDate: moment(endDateTime).format('YYYY-MM-DD'),
+    startHour: isFullDayEvent ? null : `${startHour}:${startMinutes}`,
+    // endHour: isFullDayEvent ? null : `${endHour}:${endMinutes}`,
+    endHour: null,
+    id: Math.floor(Math.random() * 100),
+    recursive: freqValue.toLowerCase(),
+  };
+};
+
 const CalendarListing = ({
   //   normalEvents = [],
-  recursiveEvents = [],
+  //   recursiveEvents = [],
   //   ModalPopUp,
   //   handleOpenModal,
   //   fetchEventsByInterval,
@@ -21,14 +59,14 @@ const CalendarListing = ({
 }) => {
   const [selectedView, setSelectedView] = useState(INITIAL_VIEW);
   let defaultEvent = {};
+  let recursiveEvents = [];
   const View = views[selectedView];
 
   const normalEvents = items
     .filter((i) => {
       if (i['@type'] !== 'Event') return false;
       if (i.recurrence) {
-        console.log('recurrent', i);
-        /* expand returns initial event as well, so we skip it here */
+        recursiveEvents = recursiveEvents.concat(expand(i));
         return false;
       }
       return true;
@@ -61,8 +99,10 @@ const CalendarListing = ({
         endHour: isFullDayEvent ? null : `${endHour}:${endMinutes}`,
         url: flattenToAppURL(i['@id']),
         id: Math.floor(Math.random() * 100),
+        recursive: 'no',
       };
     });
+  console.log({ normalEvents, recursiveEvents });
 
   const fetchEventsByInterval = (interval) => {
     return normalEvents.filter(

@@ -25,6 +25,7 @@ const applyConfig = (config) => {
     {
       id: 'calendar',
       isDefault: false,
+      fullobjects: true,
       title: 'Calendar',
       template: CalendarListing,
       /* use schemaEnhancer to add fields of CalendarBlock here */
