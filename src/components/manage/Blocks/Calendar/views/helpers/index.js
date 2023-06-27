@@ -1,6 +1,9 @@
 import moment from 'moment';
 
 export const eventStyle = (event) => {
+  if (!event) {
+    return '';
+  }
   // timed event
   if (event.startHour && event.endHour && event.startDate === event.endDate) {
     return 'task task--timed';

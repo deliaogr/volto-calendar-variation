@@ -1,49 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import '../Calendar/coursesCalendar.css';
 import * as views from '../Calendar/views';
 import moment from 'moment';
 import { INITIAL_VIEW } from '../Calendar/constants';
 import { flattenToAppURL } from '@plone/volto/helpers';
-import { RRule, rrulestr } from 'rrule';
 
 const viewNames = Object.keys(views);
-
-const expand = (item) => {
-  let recurrence = item.recurrence;
-  if (item.recurrence.indexOf('DTSTART') < 0) {
-    var dtstart = RRule.optionsToString({
-      dtstart: new Date(item.start),
-    });
-    recurrence = dtstart + '\n' + recurrence;
-  }
-
-  const rrule = rrulestr(recurrence, { unfold: true, forceset: true });
-
-  const startDateTime = new Date(rrule.options.dtstart);
-
-  const startHour = startDateTime.getHours().toString().padStart(2, '0');
-  const startMinutes = startDateTime.getMinutes().toString().padStart(2, '0');
-
-  const isFullDayEvent =
-    startHour === '01' && startMinutes === '00' ? true : false;
-
-  const freqIndex = recurrence.indexOf('FREQ=');
-  const semicolonIndex = recurrence.indexOf(';', freqIndex);
-  const freqValue = recurrence.substring(freqIndex + 5, semicolonIndex);
-
-  return {
-    title: item.title,
-    startDate: moment(rrule.options.dtstart).format('YYYY-MM-DD'),
-    endDate: null,
-    url: flattenToAppURL(item['@id']),
-    // endDate: moment(endDateTime).format('YYYY-MM-DD'),
-    startHour: isFullDayEvent ? null : `${startHour}:${startMinutes}`,
-    // endHour: isFullDayEvent ? null : `${endHour}:${endMinutes}`,
-    endHour: null,
-    id: Math.floor(Math.random() * 100),
-    recursive: freqValue.toLowerCase(),
-  };
-};
 
 const CalendarListing = ({
   //   normalEvents = [],
@@ -58,60 +20,79 @@ const CalendarListing = ({
   isEditMode,
 }) => {
   const [selectedView, setSelectedView] = useState(INITIAL_VIEW);
+  const [normalEvents, setNormalEvents] = useState([]);
+  const [recursiveEvents, setRecursiveEvents] = useState([]);
+  const [newInterval, setNewInterval] = useState();
+  const allEventsRef = useRef();
+
   let defaultEvent = {};
-  let recursiveEvents = [];
   const View = views[selectedView];
 
-  const normalEvents = items
-    .filter((i) => {
-      if (i['@type'] !== 'Event') return false;
-      if (i.recurrence) {
-        recursiveEvents = recursiveEvents.concat(expand(i));
-        return false;
-      }
-      return true;
-    })
-    .map((i) => {
-      const startDateTime = new Date(i.start);
-      const endDateTime = new Date(i.end);
+  useEffect(() => makeEventsByInterval(newInterval), [newInterval]);
 
-      const startHour = startDateTime.getHours().toString().padStart(2, '0');
-      const startMinutes = startDateTime
-        .getMinutes()
-        .toString()
-        .padStart(2, '0');
-      const endHour = endDateTime.getHours().toString().padStart(2, '0');
-      const endMinutes = endDateTime.getMinutes().toString().padStart(2, '0');
+  useEffect(() => {
+    allEventsRef.current = items
+      .filter((i) => i['@type'] === 'Event')
+      .map((i) => {
+        let freqValue = null;
+        if (i.recurrence) {
+          const freqIndex = i.recurrence.indexOf('FREQ=');
+          const semicolonIndex = i.recurrence.indexOf(';', freqIndex);
+          freqValue = i.recurrence.substring(freqIndex + 5, semicolonIndex);
+        }
 
-      const isFullDayEvent =
-        startHour === '01' &&
-        startMinutes === '00' &&
-        endHour === '00' &&
-        endMinutes === '59'
-          ? true
-          : false;
+        const startDateTime = new Date(i.start);
+        const endDateTime = new Date(i.end);
 
-      return {
-        title: i.title,
-        startDate: moment(startDateTime).format('YYYY-MM-DD'),
-        endDate: moment(endDateTime).format('YYYY-MM-DD'),
-        startHour: isFullDayEvent ? null : `${startHour}:${startMinutes}`,
-        endHour: isFullDayEvent ? null : `${endHour}:${endMinutes}`,
-        url: flattenToAppURL(i['@id']),
-        id: Math.floor(Math.random() * 100),
-        recursive: 'no',
-      };
-    });
-  console.log({ normalEvents, recursiveEvents });
+        const startHour = startDateTime.getHours().toString().padStart(2, '0');
+        const startMinutes = startDateTime
+          .getMinutes()
+          .toString()
+          .padStart(2, '0');
+        const endHour = endDateTime.getHours().toString().padStart(2, '0');
+        const endMinutes = endDateTime.getMinutes().toString().padStart(2, '0');
+
+        const isFullDayEvent =
+          startHour === '01' &&
+          startMinutes === '00' &&
+          endHour === '00' &&
+          endMinutes === '59';
+
+        return {
+          title: i.title,
+          startDate: moment(startDateTime).format('YYYY-MM-DD'),
+          endDate: moment(endDateTime).format('YYYY-MM-DD'),
+          startHour: isFullDayEvent ? null : `${startHour}:${startMinutes}`,
+          endHour: isFullDayEvent ? null : `${endHour}:${endMinutes}`,
+          url: flattenToAppURL(i['@id']),
+          id: Math.floor(Math.random() * 100),
+          recursive: freqValue ? freqValue.toLowerCase() : 'no',
+        };
+      });
+  }, [items]);
+
+  // console.log({ normalEvents, recursiveEvents });
+
+  const makeEventsByInterval = (interval) => {
+    setNormalEvents(
+      allEventsRef.current?.filter(
+        (i) =>
+          i.recursive === 'no' &&
+          moment(i.startDate).isBetween(
+            interval.startDate,
+            interval.endDate,
+            undefined,
+            '[]',
+          ),
+      ) || [],
+    );
+    setRecursiveEvents(
+      allEventsRef.current?.filter((i) => i.recursive !== 'no') || [],
+    );
+  };
 
   const fetchEventsByInterval = (interval) => {
-    return normalEvents.filter(
-      (event) =>
-        moment(event.startDate).format('YYYY-MM-DD') ===
-          moment(interval.startDate).format('YYYY-MM-DD') &&
-        moment(event.endDate).format('YYYY-MM-DD') ===
-          moment(interval.endDate).format('YYYY-MM-DD'),
-    );
+    setNewInterval(interval);
   };
 
   const editEventData = (eventData) => {
@@ -128,7 +109,7 @@ const CalendarListing = ({
   };
 
   const getCurrentEventById = (eventId) => {
-    return normalEvents[eventId];
+    return allEventsRef.current[eventId];
   };
 
   const handleEdit = (eventId) => {

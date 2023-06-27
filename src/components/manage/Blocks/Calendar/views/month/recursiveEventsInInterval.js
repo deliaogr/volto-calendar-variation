@@ -2,7 +2,6 @@ const startDateEventStartDateIntervalDiff = (interval, event) => {
   const intervalStartTime = new Date(interval.startDate).getTime();
   const eventStartTime = new Date(event.startDate).getTime();
   const result = (intervalStartTime - eventStartTime) / (1000 * 3600 * 24);
-  // return result > -7 ? result : -7;
   return result;
 };
 
@@ -53,9 +52,29 @@ export const recursiveEventsInInterval = (event, selectedInterval) => {
         : new Date(selectedInterval.startDate).getFullYear();
     eventStartDate.setFullYear(intervalYear);
   } else if (event.recursive === 'daily') {
+    eventStartDate.setTime(
+      eventStartDate.getTime() +
+        startDateEventStartDateIntervalDiff(selectedInterval, event) +
+        24 * 3600 * 1000,
+    );
   } else if (event.recursive === 'hourly') {
+    eventStartDate.setTime(
+      eventStartDate.getTime() +
+        startDateEventStartDateIntervalDiff(selectedInterval, event) +
+        3600 * 1000,
+    );
   } else if (event.recursive === 'minutely') {
+    eventStartDate.setTime(
+      eventStartDate.getTime() +
+        startDateEventStartDateIntervalDiff(selectedInterval, event) +
+        60 * 1000,
+    );
   } else if (event.recursive === 'secondly') {
+    eventStartDate.setTime(
+      eventStartDate.getTime() +
+        startDateEventStartDateIntervalDiff(selectedInterval, event) +
+        1000,
+    );
   }
 
   return (
