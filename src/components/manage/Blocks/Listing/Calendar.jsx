@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import '../Calendar/coursesCalendar.css';
 import * as views from '../Calendar/views';
 import moment from 'moment';
+import { RRule, rrulestr } from 'rrule';
 import { INITIAL_VIEW } from '../Calendar/constants';
 import { flattenToAppURL } from '@plone/volto/helpers';
 
@@ -23,26 +24,39 @@ const CalendarListing = ({
   const [normalEvents, setNormalEvents] = useState([]);
   const [recursiveEvents, setRecursiveEvents] = useState([]);
   const [newInterval, setNewInterval] = useState();
-  const allEventsRef = useRef();
+  const allEventsRef = useRef([]);
 
   let defaultEvent = {};
   const View = views[selectedView];
 
-  useEffect(() => makeEventsByInterval(newInterval), [newInterval]);
-
   useEffect(() => {
     allEventsRef.current = items
-      .filter((i) => i['@type'] === 'Event')
-      .map((i) => {
+      .filter((item) => item['@type'] === 'Event')
+      .map((event) => {
         let freqValue = null;
-        if (i.recurrence) {
-          const freqIndex = i.recurrence.indexOf('FREQ=');
-          const semicolonIndex = i.recurrence.indexOf(';', freqIndex);
-          freqValue = i.recurrence.substring(freqIndex + 5, semicolonIndex);
+        let recurrenceEndDate = null;
+        // let recurrenceInterval = null;
+        if (event.recurrence) {
+          const freqIndex = event.recurrence.indexOf('FREQ=');
+          const semicolonIndex = event.recurrence.indexOf(';', freqIndex);
+          freqValue = event.recurrence.substring(freqIndex + 5, semicolonIndex);
+
+          const rrule = rrulestr(event.recurrence);
+          recurrenceEndDate = rrule.options.until || null;
+          // const recurrenceInterval = rrule.options.interval || null;
+          // const recurrenceCount = rrule.options.count || null;
+
+          // const timeIncrementValue =
+          //   freqValue === 'monthly' ? 'M' : freqValue.slice(0, 1).toLowerCase();
+          // const calculatedEndDate = moment(new Date(event.end)).add(
+          //   recurrenceInterval * recurrenceCount,
+          //   timeIncrementValue,
+          // );
+          // console.log(event.title, calculatedEndDate.toDate());
         }
 
-        const startDateTime = new Date(i.start);
-        const endDateTime = new Date(i.end);
+        const startDateTime = new Date(event.start);
+        const endDateTime = new Date(event.end);
 
         const startHour = startDateTime.getHours().toString().padStart(2, '0');
         const startMinutes = startDateTime
@@ -52,44 +66,45 @@ const CalendarListing = ({
         const endHour = endDateTime.getHours().toString().padStart(2, '0');
         const endMinutes = endDateTime.getMinutes().toString().padStart(2, '0');
 
-        const isFullDayEvent =
-          startHour === '01' &&
-          startMinutes === '00' &&
-          endHour === '00' &&
-          endMinutes === '59';
+        const isFullDayEvent = event.whole_day ? true : false;
 
         return {
-          title: i.title,
+          title: event.title,
           startDate: moment(startDateTime).format('YYYY-MM-DD'),
           endDate: moment(endDateTime).format('YYYY-MM-DD'),
           startHour: isFullDayEvent ? null : `${startHour}:${startMinutes}`,
           endHour: isFullDayEvent ? null : `${endHour}:${endMinutes}`,
-          url: flattenToAppURL(i['@id']),
+          url: flattenToAppURL(event['@id']),
           id: Math.floor(Math.random() * 100),
           recursive: freqValue ? freqValue.toLowerCase() : 'no',
+          recurrenceEndDate: recurrenceEndDate || null,
         };
       });
   }, [items]);
 
-  // console.log({ normalEvents, recursiveEvents });
+  useEffect(() => {
+    const makeEventsByInterval = (interval) => {
+      if (!interval) return;
+      setNormalEvents(
+        allEventsRef.current.filter((event) => {
+          return (
+            event.recursive === 'no' &&
+            moment(event.startDate).isBetween(
+              interval.startDate,
+              interval.endDate,
+              undefined,
+              '[]',
+            )
+          );
+        }) || [],
+      );
+      setRecursiveEvents(
+        allEventsRef.current.filter((event) => event.recursive !== 'no') || [],
+      );
+    };
 
-  const makeEventsByInterval = (interval) => {
-    setNormalEvents(
-      allEventsRef.current?.filter(
-        (i) =>
-          i.recursive === 'no' &&
-          moment(i.startDate).isBetween(
-            interval.startDate,
-            interval.endDate,
-            undefined,
-            '[]',
-          ),
-      ) || [],
-    );
-    setRecursiveEvents(
-      allEventsRef.current?.filter((i) => i.recursive !== 'no') || [],
-    );
-  };
+    makeEventsByInterval(newInterval);
+  }, [newInterval, allEventsRef]);
 
   const fetchEventsByInterval = (interval) => {
     setNewInterval(interval);
