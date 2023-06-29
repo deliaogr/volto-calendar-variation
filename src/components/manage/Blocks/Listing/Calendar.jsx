@@ -35,24 +35,28 @@ const CalendarListing = ({
       .map((event) => {
         let freqValue = null;
         let recurrenceEndDate = null;
-        // let recurrenceInterval = null;
+        let recurrenceInterval = null;
         if (event.recurrence) {
           const freqIndex = event.recurrence.indexOf('FREQ=');
           const semicolonIndex = event.recurrence.indexOf(';', freqIndex);
           freqValue = event.recurrence.substring(freqIndex + 5, semicolonIndex);
 
           const rrule = rrulestr(event.recurrence);
-          recurrenceEndDate = rrule.options.until || null;
-          // const recurrenceInterval = rrule.options.interval || null;
-          // const recurrenceCount = rrule.options.count || null;
 
-          // const timeIncrementValue =
-          //   freqValue === 'monthly' ? 'M' : freqValue.slice(0, 1).toLowerCase();
-          // const calculatedEndDate = moment(new Date(event.end)).add(
-          //   recurrenceInterval * recurrenceCount,
-          //   timeIncrementValue,
-          // );
-          // console.log(event.title, calculatedEndDate.toDate());
+          recurrenceInterval = rrule.options.interval || null;
+          const recurrenceCount = rrule.options.count || null;
+
+          const timeIncrementValue =
+            freqValue === 'monthly' ? 'M' : freqValue.slice(0, 1).toLowerCase();
+          const calculatedEndDate =
+            recurrenceCount &&
+            moment(new Date(event.end)).add(
+              recurrenceInterval * recurrenceCount - 1,
+              timeIncrementValue,
+            );
+
+          recurrenceEndDate =
+            rrule.options.until || calculatedEndDate.toDate() || null;
         }
 
         const startDateTime = new Date(event.start);
@@ -77,7 +81,9 @@ const CalendarListing = ({
           url: flattenToAppURL(event['@id']),
           id: Math.floor(Math.random() * 100),
           recursive: freqValue ? freqValue.toLowerCase() : 'no',
-          recurrenceEndDate: recurrenceEndDate || null,
+          recurrenceEndDate:
+            moment(recurrenceEndDate).format('YYYY-MM-DD') || null,
+          recurrenceInterval: recurrenceInterval || 1,
         };
       });
   }, [items]);
