@@ -80,6 +80,7 @@ const ListingVariation = ({ items, isEditMode }) => {
           makeDefaultEvent,
           editEventData,
           isEditMode,
+          newInterval,
         }}
       />
     </div>

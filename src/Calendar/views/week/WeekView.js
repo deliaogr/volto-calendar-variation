@@ -9,55 +9,68 @@ import { makeInterval } from './makeInterval';
 import { removeDraggedEvent, addDroppedEvent } from '../helpers';
 import moment from 'moment';
 import eventsMatrix from '../month/eventsMatrix';
-import { recursiveEventsInInterval } from '../month/recursiveEventsInInterval';
-import { recursiveFunctions } from '../month/recursiveFunctions';
 
 const Week = ({
   viewNames,
   setSelectedView,
-  ModalPopUp,
+  // ModalPopUp,
   handleEdit,
-  normalEvents = [],
-  recursiveEvents = [],
   fetchEventsByInterval,
   editEventData,
-  handleOpenModal,
+  // handleOpenModal,
   makeDefaultEvent,
   isEditMode,
+  allEvents = [],
 }) => {
-  const [allEvents, setAllEvents] = useState([]);
-
-  useEffect(() => {
-    const selectedInterval = makeInterval(
-      new Date(firstDayOfCurrentWeek).getFullYear(),
-      new Date(firstDayOfCurrentWeek).getMonth(),
-      new Date(firstDayOfCurrentWeek).getDate(),
-      new Date(lastDayOfCurrentWeek).getFullYear(),
-      new Date(lastDayOfCurrentWeek).getMonth(),
-      new Date(lastDayOfCurrentWeek).getDate(),
-    );
-
-    const relevantRecursiveEvents = recursiveEvents.filter((event) =>
-      recursiveEventsInInterval(event, selectedInterval),
-    );
-
-    const allRecursiveEvents = relevantRecursiveEvents.reduce(
-      (acc, currentEvent) => {
-        return [
-          ...acc,
-          ...recursiveFunctions[currentEvent.recursive](
-            currentEvent,
-            selectedInterval,
-          ),
-        ];
-      },
-      [],
-    );
-
-    setAllEvents([...normalEvents, ...allRecursiveEvents]);
-  }, [normalEvents, recursiveEvents]);
+  const fillCalendarDays = (allEvents, selectedWeek) => {
+    const result = [...selectedWeekDaysWithEvents(selectedWeek, allEvents)];
+    return result;
+  };
 
   const fullDayEvents = allEvents.filter((event) => event.startHour === null);
+  const hourEvents = allEvents.filter((event) => event.startHour !== null);
+
+  const [selectedWeek, setSelectedWeek] = useState(
+    firstAndLastDayOfTheWeek(new Date()),
+  );
+
+  const [weekHours, setWeekHours] = useState(
+    fillCalendarDays(allEvents, firstAndLastDayOfTheWeek(new Date())),
+  );
+
+  const [eventsMatrixState, setEventsMatrixState] = useState(
+    eventsMatrix(fullDayEvents),
+  );
+
+  let firstDayOfCurrentWeek = new Date(
+    `${selectedWeek.startYear}/${selectedWeek.startMonth}/${selectedWeek.startDay}`,
+  );
+  let lastDayOfCurrentWeek = new Date(
+    `${selectedWeek.endYear}/${selectedWeek.endMonth}/${selectedWeek.endDay}`,
+  );
+
+  const daysOfTheWeekIndicators = DAYS_OF_THE_WEEK_WEEK_VIEW.map(
+    (dayOfTheWeek, i) => {
+      return i === 0 ? (
+        <span className="day-name" key={i}></span>
+      ) : (
+        <span key={`key-${i}`} className="day-name">
+          {dayOfTheWeek} {weekHours[i].dayNumber}
+        </span>
+      );
+    },
+  );
+
+  // useEffect(() => {
+  //   const selectedInterval = makeInterval(
+  //     new Date(firstDayOfCurrentWeek).getFullYear(),
+  //     new Date(firstDayOfCurrentWeek).getMonth(),
+  //     new Date(firstDayOfCurrentWeek).getDate(),
+  //     new Date(lastDayOfCurrentWeek).getFullYear(),
+  //     new Date(lastDayOfCurrentWeek).getMonth(),
+  //     new Date(lastDayOfCurrentWeek).getDate(),
+  //   );
+  // }, [allEvents]);
 
   const updateEventDatesWeekView = (
     eventToMove,
@@ -115,44 +128,6 @@ const Week = ({
     updateEventDatesWeekView(eventToMove, destinationDay, editEventData);
     setWeekHours(allDaysCurrentWeek);
   };
-
-  const fillCalendarDays = (allEvents, selectedWeek) => {
-    const result = [...selectedWeekDaysWithEvents(selectedWeek, allEvents)];
-    return result;
-  };
-
-  const [selectedWeek, setSelectedWeek] = useState(
-    firstAndLastDayOfTheWeek(new Date()),
-  );
-
-  const [weekHours, setWeekHours] = useState(
-    fillCalendarDays(allEvents, firstAndLastDayOfTheWeek(new Date())),
-  );
-
-  const [eventsMatrixState, setEventsMatrixState] = useState(
-    eventsMatrix(fullDayEvents),
-  );
-
-  const hourEvents = allEvents.filter((event) => event.startHour !== null);
-
-  const daysOfTheWeekIndicators = DAYS_OF_THE_WEEK_WEEK_VIEW.map(
-    (dayOfTheWeek, i) => {
-      return i === 0 ? (
-        <span className="day-name" key={i}></span>
-      ) : (
-        <span key={`key-${i}`} className="day-name">
-          {dayOfTheWeek} {weekHours[i].dayNumber}
-        </span>
-      );
-    },
-  );
-
-  let firstDayOfCurrentWeek = new Date(
-    `${selectedWeek.startYear}/${selectedWeek.startMonth}/${selectedWeek.startDay}`,
-  );
-  let lastDayOfCurrentWeek = new Date(
-    `${selectedWeek.endYear}/${selectedWeek.endMonth}/${selectedWeek.endDay}`,
-  );
 
   const onChangeWeek = (firstDay, lastDay) => {
     setSelectedWeek(firstAndLastDayOfTheWeek(firstDay));

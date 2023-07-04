@@ -9,53 +9,47 @@ import moment from 'moment';
 import { removeDraggedEvent, addDroppedEvent } from '../helpers';
 import { makeInterval } from '../week/makeInterval';
 import eventsMatrix from './eventsMatrix';
-import { recursiveEventsInInterval } from './recursiveEventsInInterval';
-import { recursiveFunctions } from './recursiveFunctions';
+
 const Month = ({
   viewNames,
   setSelectedView,
-  ModalPopUp,
+  // ModalPopUp,
   handleEdit,
-  normalEvents,
-  recursiveEvents,
   fetchEventsByInterval,
   editEventData,
-  handleOpenModal,
+  // handleOpenModal,
   makeDefaultEvent,
   isEditMode,
+  allEvents = [],
 }) => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setCurrentMonth] = useState(
     MONTHS[new Date().getMonth()],
   );
-  const [allEvents, setAllEvents] = useState([]);
 
-  useEffect(() => {
-    const selectedInterval = makeIntervalToFetchMonthEvents(
-      selectedMonth,
-      selectedYear,
-      allEvents,
-    );
+  const [daysOfTheMonth, setDaysOfTheMonth] = useState(
+    fillCalendarDays(new Date().getMonth(), allEvents, selectedYear),
+  );
 
-    const relevantRecursiveEvents = recursiveEvents.filter((event) =>
-      recursiveEventsInInterval(event, selectedInterval),
-    );
+  const [eventsMatrixState, setEventsMatrixState] = useState(
+    eventsMatrix(allEvents),
+  );
 
-    const allRecursiveEvents = relevantRecursiveEvents.reduce(
-      (acc, currentEvent) => {
-        return [
-          ...acc,
-          ...recursiveFunctions[currentEvent.recursive](
-            currentEvent,
-            selectedInterval,
-          ),
-        ];
-      },
-      [],
-    );
+  const daysOfTheWeekIndicators = DAYS_OF_THE_WEEK_MONTH_VIEW.map(
+    (dayOfTheWeek, i) => (
+      <span key={`key-${i}`} className="day-name">
+        {dayOfTheWeek}
+      </span>
+    ),
+  );
 
-    setAllEvents([...normalEvents, ...allRecursiveEvents]);
-  }, [normalEvents, recursiveEvents]);
+  // useEffect(() => {
+  //   const selectedInterval = makeIntervalToFetchMonthEvents(
+  //     selectedMonth,
+  //     selectedYear,
+  //     allEvents,
+  //   );
+  // }, [allEvents]);
 
   const updateEventDatesMonthView = (
     eventToMove,
@@ -129,22 +123,6 @@ const Month = ({
     updateEventDatesMonthView(eventToMove, destinationDay, editEventData);
     setDaysOfTheMonth(allDaysCurrentMonth);
   };
-
-  const daysOfTheWeekIndicators = DAYS_OF_THE_WEEK_MONTH_VIEW.map(
-    (dayOfTheWeek, i) => (
-      <span key={`key-${i}`} className="day-name">
-        {dayOfTheWeek}
-      </span>
-    ),
-  );
-
-  const [daysOfTheMonth, setDaysOfTheMonth] = useState(
-    fillCalendarDays(new Date().getMonth(), allEvents, selectedYear),
-  );
-
-  const [eventsMatrixState, setEventsMatrixState] = useState(
-    eventsMatrix(allEvents),
-  );
 
   const setNextYear = () => {
     const year = selectedYear + 1;

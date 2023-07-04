@@ -1,7 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './coursesCalendar.css';
 import * as views from './views';
 import { INITIAL_VIEW } from './constants';
+// import { firstAndLastDayOfTheWeek } from './views/week/firstAndLastDayOfTheWeek';
+// import { makeIntervalToFetchMonthEvents } from './views/month/makeIntervalToFetchMonthEvents';
+// import { makeInterval } from './views/week/makeInterval';
+import { recursiveEventsInInterval } from './views/month/recursiveEventsInInterval';
+import { recursiveFunctions } from './views/month/recursiveFunctions';
 
 const viewNames = Object.keys(views);
 
@@ -14,103 +19,47 @@ const Calendar = ({
   getCurrentEventById,
   makeDefaultEvent,
   editEventData,
-  items,
   isEditMode,
+  newInterval: selectedInterval,
 }) => {
   const [selectedView, setSelectedView] = useState(INITIAL_VIEW);
-  // const [normalEvents, setNormalEvents] = useState([]);
-  // const [recursiveEvents, setRecursiveEvents] = useState([]);
-  // const [newInterval, setNewInterval] = useState();
-  // const allEventsRef = useRef([]);
 
   const View = views[selectedView];
 
-  // useEffect(() => {
-  //   allEventsRef.current = items
-  //     .filter((item) => item['@type'] === 'Event')
-  //     .map((event) => {
-  //       let freqValue = null;
-  //       let recurrenceEndDate = null;
-  //       let recurrenceInterval = null;
-  //       if (event.recurrence) {
-  //         const freqIndex = event.recurrence.indexOf('FREQ=');
-  //         const semicolonIndex = event.recurrence.indexOf(';', freqIndex);
-  //         freqValue = event.recurrence.substring(freqIndex + 5, semicolonIndex);
+  const [allEvents, setAllEvents] = useState([]);
 
-  //         const rrule = rrulestr(event.recurrence);
+  useEffect(() => {
+    // const selectedInterval =
+    //   selectedView === 'Month'
+    //     ? makeIntervalToFetchMonthEvents(selectedMonth, selectedYear, allEvents)
+    //     : makeInterval(
+    //         new Date(firstDayOfCurrentWeek).getFullYear(),
+    //         new Date(firstDayOfCurrentWeek).getMonth(),
+    //         new Date(firstDayOfCurrentWeek).getDate(),
+    //         new Date(lastDayOfCurrentWeek).getFullYear(),
+    //         new Date(lastDayOfCurrentWeek).getMonth(),
+    //         new Date(lastDayOfCurrentWeek).getDate(),
+    //       );
 
-  //         recurrenceInterval = rrule.options.interval || null;
-  //         const recurrenceCount = rrule.options.count || null;
+    const relevantRecursiveEvents = recursiveEvents.filter((event) =>
+      recursiveEventsInInterval(event, selectedInterval),
+    );
 
-  //         const timeIncrementValue =
-  //           freqValue === 'monthly' ? 'M' : freqValue.slice(0, 1).toLowerCase();
-  //         const calculatedEndDate =
-  //           recurrenceCount &&
-  //           moment(new Date(event.end)).add(
-  //             recurrenceInterval * recurrenceCount - 1,
-  //             timeIncrementValue,
-  //           );
+    const allRecursiveEvents = relevantRecursiveEvents.reduce(
+      (acc, currentEvent) => {
+        return [
+          ...acc,
+          ...recursiveFunctions[currentEvent.recursive](
+            currentEvent,
+            selectedInterval,
+          ),
+        ];
+      },
+      [],
+    );
 
-  //         recurrenceEndDate =
-  //           rrule.options.until || calculatedEndDate.toDate() || null;
-  //       }
-
-  //       const startDateTime = new Date(event.start);
-  //       const endDateTime = new Date(event.end);
-
-  //       const startHour = startDateTime.getHours().toString().padStart(2, '0');
-  //       const startMinutes = startDateTime
-  //         .getMinutes()
-  //         .toString()
-  //         .padStart(2, '0');
-  //       const endHour = endDateTime.getHours().toString().padStart(2, '0');
-  //       const endMinutes = endDateTime.getMinutes().toString().padStart(2, '0');
-
-  //       const isFullDayEvent = event.whole_day ? true : false;
-
-  //       return {
-  //         title: event.title,
-  //         startDate: moment(startDateTime).format('YYYY-MM-DD'),
-  //         endDate: moment(endDateTime).format('YYYY-MM-DD'),
-  //         startHour: isFullDayEvent ? null : `${startHour}:${startMinutes}`,
-  //         endHour: isFullDayEvent ? null : `${endHour}:${endMinutes}`,
-  //         url: flattenToAppURL(event['@id']),
-  //         id: Math.floor(Math.random() * 100),
-  //         recursive: freqValue ? freqValue.toLowerCase() : 'no',
-  //         recurrenceEndDate:
-  //           moment(recurrenceEndDate).format('YYYY-MM-DD') || null,
-  //         recurrenceInterval: recurrenceInterval || 1,
-  //       };
-  //     });
-  // }, [items]);
-
-  // useEffect(() => {
-  //   const makeEventsByInterval = (interval) => {
-  //     if (!interval) return;
-  //     setNormalEvents(
-  //       allEventsRef.current.filter((event) => {
-  //         return (
-  //           event.recursive === 'no' &&
-  //           moment(event.startDate).isBetween(
-  //             interval.startDate,
-  //             interval.endDate,
-  //             undefined,
-  //             '[]',
-  //           )
-  //         );
-  //       }) || [],
-  //     );
-  //     setRecursiveEvents(
-  //       allEventsRef.current.filter((event) => event.recursive !== 'no') || [],
-  //     );
-  //   };
-
-  //   makeEventsByInterval(newInterval);
-  // }, [newInterval, allEventsRef]);
-
-  // const fetchEventsByInterval = (interval) => {
-  //   setNewInterval(interval);
-  // };
+    setAllEvents([...normalEvents, ...allRecursiveEvents]);
+  }, [normalEvents, recursiveEvents, selectedInterval, selectedView]);
 
   const handleEdit = (eventId) => {
     getCurrentEventById(eventId);
@@ -126,8 +75,7 @@ const Calendar = ({
           setSelectedView,
           // ModalPopUp,
           handleEdit,
-          normalEvents,
-          recursiveEvents,
+          allEvents,
           fetchEventsByInterval,
           editEventData,
           // handleOpenModal,
