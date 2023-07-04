@@ -254,18 +254,18 @@ const Day = ({
                 >
                   + see more
                 </button>
-                {/* {isOpen && (
-                    <Popup
-                      {...{
-                        events: Object.values(eventsMatrix?.[date]),
-                        setIsOpen: togglePopup,
-                        monthForPopUp: dayOfTheMonth.month,
-                        dayForPopUp: dayOfTheMonth.dayNumber,
-                        yearForPopUp: dayOfTheMonth.year,
-                        handleEdit,
-                      }}
-                    />
-                  )} */}
+                {isOpen && (
+                  <Popup
+                    {...{
+                      events: Object.values(eventsMatrix?.[date]),
+                      setIsOpen: togglePopup,
+                      monthForPopUp: dayOfTheMonth.month,
+                      dayForPopUp: dayOfTheMonth.dayNumber,
+                      yearForPopUp: dayOfTheMonth.year,
+                      handleEdit,
+                    }}
+                  />
+                )}
               </>
             )}
           </div>

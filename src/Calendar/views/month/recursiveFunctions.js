@@ -192,13 +192,14 @@ export const recursiveFunctions = {
       eventStartDate.getTime() +
         startDateEndDateDiff(currentEvent) * 24 * 3600 * 1000,
     );
+
     if (
       new Date(eventStartDate).getTime() < new Date(recurrenceEndDate).getTime()
     ) {
       generatedRecursiveEvents.push({
         ...currentEvent,
-        startDate: moment(eventStartDate).format('YYYY-MM-DD HH:mm:ss'),
-        endDate: moment(eventEndDate).format('YYYY-MM-DD HH:mm:ss'),
+        startDate: moment(eventStartDate).format('YYYY-MM-DD'),
+        endDate: moment(eventEndDate).format('YYYY-MM-DD'),
       });
     }
 
@@ -219,8 +220,8 @@ export const recursiveFunctions = {
       ) {
         generatedRecursiveEvents.push({
           ...currentEvent,
-          startDate: moment(eventStartDate).format('YYYY-MM-DD HH:mm:ss'),
-          endDate: moment(eventEndDate).format('YYYY-MM-DD HH:mm:ss'),
+          startDate: moment(eventStartDate).format('YYYY-MM-DD'),
+          endDate: moment(eventEndDate).format('YYYY-MM-DD'),
         });
       }
     } while (
@@ -253,8 +254,8 @@ export const recursiveFunctions = {
     ) {
       generatedRecursiveEvents.push({
         ...currentEvent,
-        startDate: moment(eventStartDate).format('YYYY-MM-DD HH:mm:ss'),
-        endDate: moment(eventEndDate).format('YYYY-MM-DD HH:mm:ss'),
+        startDate: moment(eventStartDate).format('YYYY-MM-DD'),
+        endDate: moment(eventEndDate).format('YYYY-MM-DD'),
       });
     }
 
@@ -273,8 +274,8 @@ export const recursiveFunctions = {
       ) {
         generatedRecursiveEvents.push({
           ...currentEvent,
-          startDate: moment(eventStartDate).format('YYYY-MM-DD HH:mm:ss'),
-          endDate: moment(eventEndDate).format('YYYY-MM-DD HH:mm:ss'),
+          startDate: moment(eventStartDate).format('YYYY-MM-DD'),
+          endDate: moment(eventEndDate).format('YYYY-MM-DD'),
         });
       }
     } while (
@@ -307,8 +308,8 @@ export const recursiveFunctions = {
     ) {
       generatedRecursiveEvents.push({
         ...currentEvent,
-        startDate: moment(eventStartDate).format('YYYY-MM-DD HH:mm:ss'),
-        endDate: moment(eventEndDate).format('YYYY-MM-DD HH:mm:ss'),
+        startDate: moment(eventStartDate).format('YYYY-MM-DD'),
+        endDate: moment(eventEndDate).format('YYYY-MM-DD'),
       });
     }
 
@@ -327,8 +328,8 @@ export const recursiveFunctions = {
       ) {
         generatedRecursiveEvents.push({
           ...currentEvent,
-          startDate: moment(eventStartDate).format('YYYY-MM-DD HH:mm:ss'),
-          endDate: moment(eventEndDate).format('YYYY-MM-DD HH:mm:ss'),
+          startDate: moment(eventStartDate).format('YYYY-MM-DD'),
+          endDate: moment(eventEndDate).format('YYYY-MM-DD'),
         });
       }
     } while (
@@ -361,8 +362,8 @@ export const recursiveFunctions = {
     ) {
       generatedRecursiveEvents.push({
         ...currentEvent,
-        startDate: moment(eventStartDate).format('YYYY-MM-DD HH:mm:ss'),
-        endDate: moment(eventEndDate).format('YYYY-MM-DD HH:mm:ss'),
+        startDate: moment(eventStartDate).format('YYYY-MM-DD'),
+        endDate: moment(eventEndDate).format('YYYY-MM-DD'),
       });
     }
 
@@ -380,8 +381,8 @@ export const recursiveFunctions = {
       ) {
         generatedRecursiveEvents.push({
           ...currentEvent,
-          startDate: moment(eventStartDate).format('YYYY-MM-DD HH:mm:ss'),
-          endDate: moment(eventEndDate).format('YYYY-MM-DD HH:mm:ss'),
+          startDate: moment(eventStartDate).format('YYYY-MM-DD'),
+          endDate: moment(eventEndDate).format('YYYY-MM-DD'),
         });
       }
     } while (

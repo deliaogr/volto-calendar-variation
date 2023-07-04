@@ -70,6 +70,7 @@ const Hour = ({
               isDragDisabled={isEditMode ? false : true}
             >
               {(provided) => (
+                // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
                 <section
                   key={`key-ev-${index}`}
                   onClick={() => {
@@ -120,6 +121,7 @@ const Hour = ({
               isDragDisabled={isEditMode ? false : true}
             >
               {(provided) => (
+                // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
                 <section
                   key={`key-ev-${index}`}
                   onClick={() => {
@@ -145,9 +147,8 @@ const Hour = ({
                 </section>
               )}
             </Draggable>
-          ) : (
-            <section key={`key-${index}`} className="empty-cell"></section>
-          );
+          ) : // <section key={`key-${index}`} className="empty-cell"></section>
+          null;
         })
     )
   ) : (
@@ -158,6 +159,7 @@ const Hour = ({
     hour.hour < 0 ? (
       <Droppable droppableId={`${hourIndex}`}>
         {(provided) => (
+          // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
           <div
             className="dayWeekView"
             {...provided.droppableProps}
@@ -180,6 +182,7 @@ const Hour = ({
       <section key={hourIndex}>
         <Droppable droppableId={`${hourIndex}`}>
           {(provided) => (
+            // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
             <div
               className="dayWeekView"
               {...provided.droppableProps}
