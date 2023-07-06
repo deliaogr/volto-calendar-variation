@@ -3,20 +3,20 @@ import ViewSelector from '../ViewSelector';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { DAYS_OF_THE_WEEK_MONTH_VIEW, MONTHS } from '../../constants';
 import Days from './Days';
-import { makeIntervalToFetchMonthEvents } from './makeIntervalToFetchMonthEvents';
-import { fillCalendarDays } from './fillCalendarDays';
+import { makeIntervalToFetchMonthEvents } from './helpers/makeIntervalToFetchMonthEvents';
+import { fillCalendarDays } from './helpers/fillCalendarDays';
 import moment from 'moment';
 import { removeDraggedEvent, addDroppedEvent } from '../helpers';
-import { makeInterval } from '../week/makeInterval';
-import eventsMatrix from './eventsMatrix';
+import { makeInterval } from '../week/helpers/makeInterval';
+import eventsMatrix from './helpers/eventsMatrix';
 
 const Month = ({
   viewNames,
   setSelectedView,
   // ModalPopUp,
   handleEdit,
-  fetchEventsByInterval,
-  editEventData,
+  setIntervalForNewEvents,
+  updateEvent,
   // handleOpenModal,
   makeDefaultEvent,
   isEditMode,
@@ -27,7 +27,7 @@ const Month = ({
     MONTHS[new Date().getMonth()],
   );
 
-  const [daysOfTheMonth, setDaysOfTheMonth] = useState(
+  const [days, setDays] = useState(
     fillCalendarDays(new Date().getMonth(), allEvents, selectedYear),
   );
 
@@ -35,27 +35,13 @@ const Month = ({
     eventsMatrix(allEvents),
   );
 
-  const daysOfTheWeekIndicators = DAYS_OF_THE_WEEK_MONTH_VIEW.map(
-    (dayOfTheWeek, i) => (
-      <span key={`key-${i}`} className="day-name">
-        {dayOfTheWeek}
-      </span>
-    ),
-  );
+  const dayNames = DAYS_OF_THE_WEEK_MONTH_VIEW.map((dayOfTheWeek, i) => (
+    <span key={`key-${i}`} className="day-name">
+      {dayOfTheWeek}
+    </span>
+  ));
 
-  // useEffect(() => {
-  //   const selectedInterval = makeIntervalToFetchMonthEvents(
-  //     selectedMonth,
-  //     selectedYear,
-  //     allEvents,
-  //   );
-  // }, [allEvents]);
-
-  const updateEventDatesMonthView = (
-    eventToMove,
-    destinationDay,
-    editEventData,
-  ) => {
+  const updateEventDates = (eventToMove, destinationDay, updateEvent) => {
     const { id, title, startHour, endHour, recursive } = eventToMove;
     const daysDiff =
       new Date(eventToMove.endDate).getTime() -
@@ -68,7 +54,7 @@ const Month = ({
     const endDate = moment(new Date(startDate).getTime() + daysDiff).format(
       'YYYY-MM-DD',
     );
-    return editEventData({
+    return updateEvent({
       id,
       title,
       startDate,
@@ -94,14 +80,14 @@ const Month = ({
    * @param {Number} dragResult.source.index
    * @returns
    */
-  const onDragEndMonthView = (dragResult) => {
+  const onDragEnd = (dragResult) => {
     const { source, destination } = dragResult;
     // if destination is not droppable or source is the same as destination, it will be kept in place
     if (!destination || destination?.droppableId === source?.droppableId) {
       return;
     }
     // make copy to make it safe to mutate, the source won't be changed
-    const allDaysCurrentMonth = daysOfTheMonth.slice();
+    const allDaysCurrentMonth = days.slice();
     const sourceDay = allDaysCurrentMonth[source.droppableId];
     const destinationDay = allDaysCurrentMonth[destination.droppableId];
     const eventToMove = sourceDay.events[source.index];
@@ -120,8 +106,8 @@ const Month = ({
         allEvents,
       ),
     };
-    updateEventDatesMonthView(eventToMove, destinationDay, editEventData);
-    setDaysOfTheMonth(allDaysCurrentMonth);
+    updateEventDates(eventToMove, destinationDay, updateEvent);
+    setDays(allDaysCurrentMonth);
   };
 
   const setNextYear = () => {
@@ -138,18 +124,18 @@ const Month = ({
 
   const onChangeMonth = (monthSelection, year) => {
     setCurrentMonth(monthSelection);
-    fetchEventsByInterval(
+    setIntervalForNewEvents(
       makeIntervalToFetchMonthEvents(monthSelection, year, []),
     );
   };
 
-  const handleChangePreviousMonth = () => {
+  const handlePreviousMonth = () => {
     selectedMonth.key > 0
       ? onChangeMonth(MONTHS[selectedMonth.key - 1], selectedYear)
       : setPreviousYear();
   };
 
-  const handleChangeNextMonth = () => {
+  const handleNextMonth = () => {
     selectedMonth.key < 11
       ? onChangeMonth(MONTHS[selectedMonth.key + 1], selectedYear)
       : setNextYear();
@@ -166,6 +152,7 @@ const Month = ({
     // handleOpenModal();
   };
 
+  // TODO: rename & remove
   const displayMonth = (
     <div className="dropdown">
       <button className="dropbtn">
@@ -187,15 +174,13 @@ const Month = ({
   );
 
   useEffect(() => {
-    fetchEventsByInterval(
+    setIntervalForNewEvents(
       makeIntervalToFetchMonthEvents(selectedMonth, selectedYear, []),
     );
   }, []);
 
   useEffect(() => {
-    setDaysOfTheMonth(
-      fillCalendarDays(selectedMonth.key, allEvents, selectedYear),
-    );
+    setDays(fillCalendarDays(selectedMonth.key, allEvents, selectedYear));
   }, [allEvents, selectedMonth.key, selectedYear]);
 
   useEffect(() => {
@@ -205,23 +190,24 @@ const Month = ({
   return (
     <div>
       <DragDropContext
-        onDragEnd={onDragEndMonthView}
+        onDragEnd={onDragEnd}
         enableDefaultSensors={isEditMode ? true : false}
       >
         <div className="calendar-container">
+          {/* TODO: remove */}
           <ViewSelector
             {...{ selectedView: 'Month', viewNames, setSelectedView }}
-            handleChangePrevious={handleChangePreviousMonth}
-            handleChangeNext={handleChangeNextMonth}
+            handleChangePrevious={handlePreviousMonth}
+            handleChangeNext={handleNextMonth}
             handleToday={handleToday}
           >
             {displayMonth}
           </ViewSelector>
           <div className="calendar">
-            {daysOfTheWeekIndicators}
+            {dayNames}
             <Days
               {...{
-                daysOfTheMonth,
+                days,
                 handleCreate,
                 handleEdit,
                 eventsMatrix: eventsMatrixState,

@@ -1,4 +1,4 @@
-import { MONTHS } from '../../constants';
+import { MONTHS } from '../../../constants';
 import { makeEventsForDay } from './makeEventsForDay';
 
 export const previousMonthDisabledDays = (

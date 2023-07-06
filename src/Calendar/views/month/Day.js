@@ -4,23 +4,26 @@ import { eventStyle } from '../helpers';
 import moment from 'moment';
 import Popup from './Popup';
 
+// TODO: separate logic from implementation
 const Day = ({
   dayIndex,
-  dayOfTheMonth,
+  day,
   handleCreate,
   handleEdit,
   eventsMatrix = {},
   isEditMode,
 }) => {
+  // TODO: rename
   const [isOpen, setIsOpen] = useState(false);
 
   const togglePopup = () => {
     setIsOpen(!isOpen);
   };
 
-  const date = moment(
-    `${dayOfTheMonth.year}, ${dayOfTheMonth.month}, ${dayOfTheMonth.dayNumber}`,
-  ).format('YYYY-MM-DD');
+  // TODO: rename
+  const date = moment(`${day.year}, ${day.month}, ${day.dayNumber}`).format(
+    'YYYY-MM-DD',
+  );
 
   const highestIndex = () => {
     const res = eventsMatrix?.[date]
@@ -95,7 +98,7 @@ const Day = ({
     : Array(highestIndex() + 1)
         .fill(0)
         .map((_, index) => {
-          const indexEvent = dayOfTheMonth?.events
+          const indexEvent = day?.events
             .map((event) => event.id)
             .indexOf(eventsMatrix?.[date]?.[index]?.id);
           return indexEvent > -1 ? (
@@ -190,10 +193,10 @@ const Day = ({
           );
         });
 
-  const displayDay = (dayOfTheMonth) => {
-    return dayOfTheMonth.year === new Date().getFullYear() &&
-      dayOfTheMonth.month === new Date().getMonth() + 1 &&
-      dayOfTheMonth.dayNumber === new Date().getDate() ? (
+  const displayDay = (day) => {
+    return day.year === new Date().getFullYear() &&
+      day.month === new Date().getMonth() + 1 &&
+      day.dayNumber === new Date().getDate() ? (
       <div
         style={{
           width: '18px',
@@ -205,7 +208,7 @@ const Day = ({
           marginBottom: '2px',
         }}
       >
-        {dayOfTheMonth.dayNumber}
+        {day.dayNumber}
       </div>
     ) : (
       <div
@@ -213,7 +216,7 @@ const Day = ({
           marginBottom: '2px',
         }}
       >
-        {dayOfTheMonth.dayNumber}
+        {day.dayNumber}
       </div>
     );
   };
@@ -223,7 +226,7 @@ const Day = ({
       {(provided) => (
         <section
           key={`section-${dayIndex}`}
-          className={dayOfTheMonth.class}
+          className={day.class}
           {...provided.droppableProps}
           ref={provided.innerRef}
         >
@@ -231,14 +234,10 @@ const Day = ({
             <div
               key={`key-div-${dayIndex}`}
               onClick={() => {
-                handleCreate(
-                  dayOfTheMonth.year,
-                  dayOfTheMonth.month - 1,
-                  dayOfTheMonth.dayNumber,
-                );
+                handleCreate(day.year, day.month - 1, day.dayNumber);
               }}
             >
-              {displayDay(dayOfTheMonth)}
+              {displayDay(day)}
               {provided.placeholder}
             </div>
             {eventsList.length < 4 ? (
@@ -259,9 +258,9 @@ const Day = ({
                     {...{
                       events: Object.values(eventsMatrix?.[date]),
                       setIsOpen: togglePopup,
-                      monthForPopUp: dayOfTheMonth.month,
-                      dayForPopUp: dayOfTheMonth.dayNumber,
-                      yearForPopUp: dayOfTheMonth.year,
+                      monthForPopUp: day.month,
+                      dayForPopUp: day.dayNumber,
+                      yearForPopUp: day.year,
                       handleEdit,
                     }}
                   />

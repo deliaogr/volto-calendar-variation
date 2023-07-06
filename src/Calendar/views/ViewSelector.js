@@ -1,5 +1,6 @@
 import React from 'react';
 
+// TODO: move to Calendar
 const ViewSelector = ({
   selectedView,
   viewNames,

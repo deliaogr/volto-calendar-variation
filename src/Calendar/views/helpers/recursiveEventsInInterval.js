@@ -79,10 +79,11 @@ export const recursiveEventsInInterval = (event, selectedInterval) => {
 
   return (
     new Date(event.startDate).getTime() <
-      new Date(selectedInterval.endDate).getTime() &&
-    new Date(selectedInterval.startDate).getTime() <
-      new Date(eventStartDate).getTime() &&
-    new Date(eventStartDate).getTime() <
-      new Date(selectedInterval.endDate).getTime()
+    new Date(selectedInterval.endDate).getTime()
+    // &&
+    // new Date(selectedInterval.startDate).getTime() <
+    //   new Date(eventStartDate).getTime() &&
+    // new Date(eventStartDate).getTime() <
+    //   new Date(selectedInterval.endDate).getTime()
   );
 };

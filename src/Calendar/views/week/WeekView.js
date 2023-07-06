@@ -2,31 +2,26 @@ import React, { useState, useEffect } from 'react';
 import ViewSelector from '../ViewSelector';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { DAYS_OF_THE_WEEK_WEEK_VIEW, MONTHS } from '../../constants';
-import { firstAndLastDayOfTheWeek } from './firstAndLastDayOfTheWeek';
-import { selectedWeekDaysWithEvents } from './selectedWeekDaysWithEvents';
+import { firstAndLastDayOfTheWeek } from './helpers/firstAndLastDayOfTheWeek';
+import { fillCalendarDays } from './helpers/fillCalendarDays';
 import Hours from './Hours';
-import { makeInterval } from './makeInterval';
+import { makeInterval } from './helpers/makeInterval';
 import { removeDraggedEvent, addDroppedEvent } from '../helpers';
 import moment from 'moment';
-import eventsMatrix from '../month/eventsMatrix';
+import eventsMatrix from '../month/helpers/eventsMatrix';
 
 const Week = ({
   viewNames,
   setSelectedView,
   // ModalPopUp,
   handleEdit,
-  fetchEventsByInterval,
-  editEventData,
+  setIntervalForNewEvents,
+  updateEvent,
   // handleOpenModal,
   makeDefaultEvent,
   isEditMode,
   allEvents = [],
 }) => {
-  const fillCalendarDays = (allEvents, selectedWeek) => {
-    const result = [...selectedWeekDaysWithEvents(selectedWeek, allEvents)];
-    return result;
-  };
-
   const fullDayEvents = allEvents.filter((event) => event.startHour === null);
   const hourEvents = allEvents.filter((event) => event.startHour !== null);
 
@@ -49,34 +44,17 @@ const Week = ({
     `${selectedWeek.endYear}/${selectedWeek.endMonth}/${selectedWeek.endDay}`,
   );
 
-  const daysOfTheWeekIndicators = DAYS_OF_THE_WEEK_WEEK_VIEW.map(
-    (dayOfTheWeek, i) => {
-      return i === 0 ? (
-        <span className="day-name" key={i}></span>
-      ) : (
-        <span key={`key-${i}`} className="day-name">
-          {dayOfTheWeek} {weekHours[i].dayNumber}
-        </span>
-      );
-    },
-  );
+  const dayNames = DAYS_OF_THE_WEEK_WEEK_VIEW.map((dayOfTheWeek, i) => {
+    return i === 0 ? (
+      <span className="day-name" key={i}></span>
+    ) : (
+      <span key={`key-${i}`} className="day-name">
+        {dayOfTheWeek} {weekHours[i].dayNumber}
+      </span>
+    );
+  });
 
-  // useEffect(() => {
-  //   const selectedInterval = makeInterval(
-  //     new Date(firstDayOfCurrentWeek).getFullYear(),
-  //     new Date(firstDayOfCurrentWeek).getMonth(),
-  //     new Date(firstDayOfCurrentWeek).getDate(),
-  //     new Date(lastDayOfCurrentWeek).getFullYear(),
-  //     new Date(lastDayOfCurrentWeek).getMonth(),
-  //     new Date(lastDayOfCurrentWeek).getDate(),
-  //   );
-  // }, [allEvents]);
-
-  const updateEventDatesWeekView = (
-    eventToMove,
-    destinationDay,
-    editEventData,
-  ) => {
+  const updateEventDates = (eventToMove, destinationDay, updateEvent) => {
     const { id, title } = eventToMove;
     const daysDiff =
       new Date(eventToMove.endDate).getTime() -
@@ -101,10 +79,10 @@ const Week = ({
       destinationDay.hour !== -1 && eventToMove.endHour
         ? moment(destinationDay.hour + hoursDiff, 'H').format('HH:mm')
         : null;
-    return editEventData({ id, title, startDate, endDate, startHour, endHour });
+    return updateEvent({ id, title, startDate, endDate, startHour, endHour });
   };
 
-  const onDragEndWeekView = (dragResult) => {
+  const onDragEnd = (dragResult) => {
     const { source, destination } = dragResult;
     // if destination is not droppable or source is the same as destination, it will be kept in place
     if (!destination || destination?.droppableId === source?.droppableId) {
@@ -125,13 +103,13 @@ const Week = ({
       ...destinationDay,
       events: addDroppedEvent(destinationDay, eventToMove, destination),
     };
-    updateEventDatesWeekView(eventToMove, destinationDay, editEventData);
+    updateEventDates(eventToMove, destinationDay, updateEvent);
     setWeekHours(allDaysCurrentWeek);
   };
 
   const onChangeWeek = (firstDay, lastDay) => {
     setSelectedWeek(firstAndLastDayOfTheWeek(firstDay));
-    fetchEventsByInterval(
+    setIntervalForNewEvents(
       makeInterval(
         new Date(firstDay).getFullYear(),
         new Date(firstDay).getMonth(),
@@ -143,7 +121,7 @@ const Week = ({
     );
   };
 
-  const handleChangePreviousWeek = () => {
+  const handlePreviousWeek = () => {
     firstDayOfCurrentWeek = new Date(
       firstDayOfCurrentWeek.setDate(firstDayOfCurrentWeek.getDate() - 7),
     );
@@ -153,7 +131,7 @@ const Week = ({
     onChangeWeek(firstDayOfCurrentWeek, lastDayOfCurrentWeek);
   };
 
-  const handleChangeNextWeek = () => {
+  const handleNextWeek = () => {
     firstDayOfCurrentWeek = new Date(
       firstDayOfCurrentWeek.setDate(firstDayOfCurrentWeek.getDate() + 7),
     );
@@ -197,7 +175,7 @@ const Week = ({
   };
 
   useEffect(() => {
-    fetchEventsByInterval(
+    setIntervalForNewEvents(
       makeInterval(
         selectedWeek.startYear,
         selectedWeek.startMonth - 1,
@@ -229,21 +207,21 @@ const Week = ({
   return (
     <div>
       <DragDropContext
-        onDragEnd={onDragEndWeekView}
+        onDragEnd={onDragEnd}
         enableDefaultSensors={isEditMode ? true : false}
       >
         <div className="calendar-container">
           <ViewSelector
             {...{ selectedView: 'Week', viewNames, setSelectedView }}
-            handleChangePrevious={handleChangePreviousWeek}
-            handleChangeNext={handleChangeNextWeek}
+            handleChangePrevious={handlePreviousWeek}
+            handleChangeNext={handleNextWeek}
             handleToday={handleToday}
           >
             <div className="dropdown dropbtn">{displayWeeks(selectedWeek)}</div>
           </ViewSelector>
           <div className="hours-weekdays-wrapper">
             <div className="calendarWeekView">
-              {daysOfTheWeekIndicators}
+              {dayNames}
               <Hours
                 {...{
                   weekHours,

@@ -1,16 +1,27 @@
 import React, { useState, useEffect, useRef } from 'react';
 import moment from 'moment';
 import Calendar from '../Calendar/Calendar';
-import { formatEvents } from '../Connector';
+import { formatEvents } from '../Utils/Connector';
+import { recursiveEventsTool } from '../Utils/RecursiveEventsTool';
+/* 
+  TODO: refactor:
+  1. recursivator
+  2. refactor views
+  3. connector
+**/
 
-const ListingVariation = ({ items, isEditMode }) => {
-  const [normalEvents, setNormalEvents] = useState([]);
-  const [recursiveEvents, setRecursiveEvents] = useState([]);
-  const [newInterval, setNewInterval] = useState();
+// TODO: rename
+const CalendarVariation = ({ items, isEditMode }) => {
+  // const [normalEvents, setNormalEvents] = useState([]);
+  // const [recursiveEvents, setRecursiveEvents] = useState([]);
   const allEventsRef = useRef([]);
+
+  const [allEventsInInterval, setAllEventsInInterval] = useState([]);
+  const [newInterval, setNewInterval] = useState();
 
   let defaultEvent = {};
 
+  // TODO: refactor ?
   useEffect(() => {
     let filteredEvents = items.filter((item) => item['@type'] === 'Event');
     allEventsRef.current = formatEvents(filteredEvents);
@@ -19,7 +30,7 @@ const ListingVariation = ({ items, isEditMode }) => {
   useEffect(() => {
     const makeEventsByInterval = (interval) => {
       if (!interval) return;
-      setNormalEvents(
+      const normalEvents =
         allEventsRef.current.filter((event) => {
           return (
             event.recursive === 'no' &&
@@ -30,21 +41,27 @@ const ListingVariation = ({ items, isEditMode }) => {
               '[]',
             )
           );
-        }) || [],
+        }) || [];
+
+      const filteredRecursiveEvents =
+        allEventsRef.current.filter((event) => event.recursive !== 'no') || [];
+
+      const recursiveEvents = recursiveEventsTool(
+        filteredRecursiveEvents,
+        interval,
       );
-      setRecursiveEvents(
-        allEventsRef.current.filter((event) => event.recursive !== 'no') || [],
-      );
+
+      setAllEventsInInterval([...normalEvents, ...recursiveEvents]);
     };
 
     makeEventsByInterval(newInterval);
-  }, [newInterval, allEventsRef]);
+  }, [newInterval]);
 
-  const fetchEventsByInterval = (interval) => {
+  const setIntervalForNewEvents = (interval) => {
     setNewInterval(interval);
   };
 
-  const editEventData = (eventData) => {
+  const updateEvent = (eventData) => {
     // editEvent({
     //   title: eventData.title,
     //   startDate: eventData.startDate,
@@ -71,20 +88,18 @@ const ListingVariation = ({ items, isEditMode }) => {
     <div>
       <Calendar
         {...{
-          normalEvents,
-          recursiveEvents,
           // ModalPopUp,
           // handleOpenModal,
-          fetchEventsByInterval,
+          setIntervalForNewEvents,
           getCurrentEventById,
           makeDefaultEvent,
-          editEventData,
+          updateEvent,
           isEditMode,
-          newInterval,
+          allEventsInInterval,
         }}
       />
     </div>
   );
 };
 
-export default ListingVariation;
+export default CalendarVariation;

@@ -1,7 +1,7 @@
 import { previousMonthDisabledDays } from './previousMonthDisabledDays';
 import { nextMonthDisabledDays } from './nextMonthDisabledDays';
 import { selectedMonthDaysWithEvents } from './selectedMonthDaysWithEvents';
-import { MONTHS } from '../../constants';
+import { MONTHS } from '../../../constants';
 
 export const fillCalendarDays = (selectedMonthIndex, events, selectedYear) => {
   // check leap year

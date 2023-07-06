@@ -1,18 +1,12 @@
 import React from 'react';
 import Day from './Day';
 
-const Days = ({
-  daysOfTheMonth,
-  handleCreate,
-  handleEdit,
-  eventsMatrix,
-  isEditMode,
-}) => {
-  return daysOfTheMonth.map((dayOfTheMonth, dayIndex) => (
+const Days = ({ days, handleCreate, handleEdit, eventsMatrix, isEditMode }) => {
+  return days.map((day, dayIndex) => (
     <Day
       {...{
         dayIndex,
-        dayOfTheMonth,
+        day,
         handleCreate,
         handleEdit,
         eventsMatrix,
