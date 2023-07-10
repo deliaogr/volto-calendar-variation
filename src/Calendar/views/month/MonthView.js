@@ -1,18 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import ViewSelector from '../ViewSelector';
 import { DragDropContext } from 'react-beautiful-dnd';
-import { DAYS_OF_THE_WEEK_MONTH_VIEW, MONTHS } from '../../constants';
+import { DAYS_OF_THE_WEEK_MONTH_VIEW } from '../../constants';
 import Days from './Days';
-import { makeIntervalToFetchMonthEvents } from './helpers/makeIntervalToFetchMonthEvents';
-import { fillCalendarDays } from './helpers/fillCalendarDays';
+import { makeIntervalToFetchMonthEvents } from './utils/makeIntervalToFetchMonthEvents';
+import { fillCalendarDays } from './utils/fillCalendarDays';
 import moment from 'moment';
 import { removeDraggedEvent, addDroppedEvent } from '../helpers';
-import { makeInterval } from '../week/helpers/makeInterval';
-import eventsMatrix from './helpers/eventsMatrix';
+import { makeInterval } from '../week/utils/makeInterval';
+import eventsMatrix from './utils/eventsMatrix';
 
 const Month = ({
-  viewNames,
-  setSelectedView,
   // ModalPopUp,
   handleEdit,
   setIntervalForNewEvents,
@@ -21,11 +18,10 @@ const Month = ({
   makeDefaultEvent,
   isEditMode,
   allEvents = [],
+  // part of refactoring
+  selectedPeriod: selectedMonth,
+  selectedYear,
 }) => {
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [selectedMonth, setCurrentMonth] = useState(
-    MONTHS[new Date().getMonth()],
-  );
 
   const [days, setDays] = useState(
     fillCalendarDays(new Date().getMonth(), allEvents, selectedYear),
@@ -110,68 +106,10 @@ const Month = ({
     setDays(allDaysCurrentMonth);
   };
 
-  const setNextYear = () => {
-    const year = selectedYear + 1;
-    setSelectedYear(year);
-    onChangeMonth(MONTHS[0], year);
-  };
-
-  const setPreviousYear = () => {
-    const year = selectedYear - 1;
-    setSelectedYear(year);
-    onChangeMonth(MONTHS[11], year);
-  };
-
-  const onChangeMonth = (monthSelection, year) => {
-    setCurrentMonth(monthSelection);
-    setIntervalForNewEvents(
-      makeIntervalToFetchMonthEvents(monthSelection, year, []),
-    );
-  };
-
-  const handlePreviousMonth = () => {
-    selectedMonth.key > 0
-      ? onChangeMonth(MONTHS[selectedMonth.key - 1], selectedYear)
-      : setPreviousYear();
-  };
-
-  const handleNextMonth = () => {
-    selectedMonth.key < 11
-      ? onChangeMonth(MONTHS[selectedMonth.key + 1], selectedYear)
-      : setNextYear();
-  };
-
-  const handleToday = () => {
-    setSelectedYear(new Date().getFullYear());
-    const year = new Date().getFullYear();
-    onChangeMonth(MONTHS[new Date().getMonth()], year);
-  };
-
   const handleCreate = (year, month, day) => {
     makeDefaultEvent(makeInterval(year, month, day, year, month, day));
     // handleOpenModal();
   };
-
-  // TODO: rename & remove
-  const displayMonth = (
-    <div className="dropdown">
-      <button className="dropbtn">
-        {selectedMonth.text} {selectedYear}
-      </button>
-      <div className="dropdown-content">
-        {MONTHS.map((month, index) => (
-          // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events
-          <p
-            key={`key-${index}`}
-            onClick={() => onChangeMonth(MONTHS[month.key], selectedYear)}
-            className="dropdown-content-btn"
-          >
-            {month.text} {selectedYear}
-          </p>
-        ))}
-      </div>
-    </div>
-  );
 
   useEffect(() => {
     setIntervalForNewEvents(
@@ -193,30 +131,19 @@ const Month = ({
         onDragEnd={onDragEnd}
         enableDefaultSensors={isEditMode ? true : false}
       >
-        <div className="calendar-container">
-          {/* TODO: remove */}
-          <ViewSelector
-            {...{ selectedView: 'Month', viewNames, setSelectedView }}
-            handleChangePrevious={handlePreviousMonth}
-            handleChangeNext={handleNextMonth}
-            handleToday={handleToday}
-          >
-            {displayMonth}
-          </ViewSelector>
-          <div className="calendar">
-            {dayNames}
-            <Days
-              {...{
-                days,
-                handleCreate,
-                handleEdit,
-                eventsMatrix: eventsMatrixState,
-                isEditMode,
-              }}
-            />
-          </div>
-          {/* <ModalPopUp /> */}
+        <div className="calendar">
+          {dayNames}
+          <Days
+            {...{
+              days,
+              handleCreate,
+              handleEdit,
+              eventsMatrix: eventsMatrixState,
+              isEditMode,
+            }}
+          />
         </div>
+        {/* <ModalPopUp /> */}
       </DragDropContext>
     </div>
   );

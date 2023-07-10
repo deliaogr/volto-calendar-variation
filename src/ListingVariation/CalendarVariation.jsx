@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import moment from 'moment';
 import Calendar from '../Calendar/Calendar';
 import { formatEvents } from '../Utils/Connector';
-import { recursiveEventsTool } from '../Utils/RecursiveEventsTool';
+import { recursiveEventsTool } from '../Utils/Recursivator/RecursiveEventsTool';
 /* 
   TODO: refactor:
   1. recursivator

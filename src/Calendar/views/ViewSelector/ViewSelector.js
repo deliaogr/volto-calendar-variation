@@ -1,6 +1,5 @@
 import React from 'react';
 
-// TODO: move to Calendar
 const ViewSelector = ({
   selectedView,
   viewNames,
@@ -8,7 +7,12 @@ const ViewSelector = ({
   handleChangePrevious,
   handleChangeNext,
   handleToday,
-  children: displayMonth,
+  selectedPeriod,
+  selectedYear,
+  setSelectedYear,
+  setSelectedPeriod,
+  displayPeriod,
+  setIntervalForNewEvents,
 }) => {
   const viewSelect = (
     <div className="dropdown">
@@ -32,15 +36,43 @@ const ViewSelector = ({
     <div className="calendar-header">
       <button
         className="calendar-header-arrow-btn"
-        onClick={handleChangePrevious}
+        onClick={() =>
+          handleChangePrevious(
+            selectedPeriod,
+            setSelectedPeriod,
+            setIntervalForNewEvents,
+            selectedYear,
+            setSelectedYear,
+          )
+        }
       >
         <img src="https://i.imgur.com/2gqThFI.png" alt="left-arrow" />
       </button>
-      {displayMonth}
-      <button className="calendar-header-arrow-btn" onClick={handleChangeNext}>
+      {displayPeriod(selectedPeriod, setSelectedPeriod, selectedYear)}
+      <button
+        className="calendar-header-arrow-btn"
+        onClick={() =>
+          handleChangeNext(
+            selectedPeriod,
+            setSelectedPeriod,
+            setIntervalForNewEvents,
+            selectedYear,
+            setSelectedYear,
+          )
+        }
+      >
         <img src="https://i.imgur.com/uambqYY.png" alt="right-arrow" />
       </button>
-      <button onClick={handleToday} className="calendar-header-today-btn">
+      <button
+        onClick={() =>
+          handleToday(
+            setSelectedPeriod,
+            setIntervalForNewEvents,
+            setSelectedYear,
+          )
+        }
+        className="calendar-header-today-btn"
+      >
         Today
       </button>
       {viewSelect}

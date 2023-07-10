@@ -1,5 +1,5 @@
 // import { recursiveEventsInInterval } from '../Calendar/views/month/recursiveEventsInInterval';
-import { recursiveFunctions } from '../Calendar/views/helpers/recursiveFunctions';
+import { recursiveFunctions } from './recursiveFunctions';
 
 export const recursiveEventsTool = (recursiveEvents, selectedInterval) => {
   //   const relevantRecursiveEvents = recursiveEvents.filter((event) =>

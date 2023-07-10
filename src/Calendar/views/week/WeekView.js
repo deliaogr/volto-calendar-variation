@@ -1,18 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import ViewSelector from '../ViewSelector';
 import { DragDropContext } from 'react-beautiful-dnd';
-import { DAYS_OF_THE_WEEK_WEEK_VIEW, MONTHS } from '../../constants';
-import { firstAndLastDayOfTheWeek } from './helpers/firstAndLastDayOfTheWeek';
-import { fillCalendarDays } from './helpers/fillCalendarDays';
+import { DAYS_OF_THE_WEEK_WEEK_VIEW } from '../../constants';
+import { firstAndLastDayOfTheWeek } from './utils/firstAndLastDayOfTheWeek';
+import { fillCalendarDays } from './utils/fillCalendarDays';
 import Hours from './Hours';
-import { makeInterval } from './helpers/makeInterval';
+import { makeInterval } from './utils/makeInterval';
 import { removeDraggedEvent, addDroppedEvent } from '../helpers';
 import moment from 'moment';
-import eventsMatrix from '../month/helpers/eventsMatrix';
+import eventsMatrix from '../month/utils/eventsMatrix';
 
 const Week = ({
-  viewNames,
-  setSelectedView,
   // ModalPopUp,
   handleEdit,
   setIntervalForNewEvents,
@@ -21,13 +18,11 @@ const Week = ({
   makeDefaultEvent,
   isEditMode,
   allEvents = [],
+  // part of refactoring
+  selectedPeriod: selectedWeek,
 }) => {
   const fullDayEvents = allEvents.filter((event) => event.startHour === null);
   const hourEvents = allEvents.filter((event) => event.startHour !== null);
-
-  const [selectedWeek, setSelectedWeek] = useState(
-    firstAndLastDayOfTheWeek(new Date()),
-  );
 
   const [weekHours, setWeekHours] = useState(
     fillCalendarDays(allEvents, firstAndLastDayOfTheWeek(new Date())),
@@ -35,13 +30,6 @@ const Week = ({
 
   const [eventsMatrixState, setEventsMatrixState] = useState(
     eventsMatrix(fullDayEvents),
-  );
-
-  let firstDayOfCurrentWeek = new Date(
-    `${selectedWeek.startYear}/${selectedWeek.startMonth}/${selectedWeek.startDay}`,
-  );
-  let lastDayOfCurrentWeek = new Date(
-    `${selectedWeek.endYear}/${selectedWeek.endMonth}/${selectedWeek.endDay}`,
   );
 
   const dayNames = DAYS_OF_THE_WEEK_WEEK_VIEW.map((dayOfTheWeek, i) => {
@@ -107,71 +95,12 @@ const Week = ({
     setWeekHours(allDaysCurrentWeek);
   };
 
-  const onChangeWeek = (firstDay, lastDay) => {
-    setSelectedWeek(firstAndLastDayOfTheWeek(firstDay));
-    setIntervalForNewEvents(
-      makeInterval(
-        new Date(firstDay).getFullYear(),
-        new Date(firstDay).getMonth(),
-        new Date(firstDay).getDate(),
-        new Date(lastDay).getFullYear(),
-        new Date(lastDay).getMonth(),
-        new Date(lastDay).getDate(),
-      ),
-    );
-  };
-
-  const handlePreviousWeek = () => {
-    firstDayOfCurrentWeek = new Date(
-      firstDayOfCurrentWeek.setDate(firstDayOfCurrentWeek.getDate() - 7),
-    );
-    lastDayOfCurrentWeek = new Date(
-      lastDayOfCurrentWeek.setDate(lastDayOfCurrentWeek.getDate() - 7),
-    );
-    onChangeWeek(firstDayOfCurrentWeek, lastDayOfCurrentWeek);
-  };
-
-  const handleNextWeek = () => {
-    firstDayOfCurrentWeek = new Date(
-      firstDayOfCurrentWeek.setDate(firstDayOfCurrentWeek.getDate() + 7),
-    );
-    lastDayOfCurrentWeek = new Date(
-      lastDayOfCurrentWeek.setDate(lastDayOfCurrentWeek.getDate() + 7),
-    );
-    onChangeWeek(firstDayOfCurrentWeek, lastDayOfCurrentWeek);
-  };
-
-  const handleToday = () => {
-    const today = firstAndLastDayOfTheWeek(new Date());
-    firstDayOfCurrentWeek = new Date(
-      `${today.startYear}/${today.startMonth}/${today.startDay}`,
-    );
-    let lastDayOfCurrentWeek = new Date(
-      `${today.endYear}/${today.endMonth}/${today.endDay}`,
-    );
-    onChangeWeek(firstDayOfCurrentWeek, lastDayOfCurrentWeek);
-  };
-
   const handleCreate = (year, month, day, startHour) => {
     makeDefaultEvent({
       ...makeInterval(year, month, day, year, month, day),
       startHour: moment(startHour, 'HH:mm'),
     });
     // handleOpenModal();
-  };
-
-  const displayWeeks = (selectedWeek) => {
-    const result =
-      selectedWeek.startMonth === selectedWeek.endMonth
-        ? `${MONTHS[selectedWeek.startMonth - 1].text} ${
-            selectedWeek.startYear
-          }`
-        : `${MONTHS[selectedWeek.startMonth - 1].text.slice(0, 3)} ${
-            selectedWeek.startYear
-          } - ${MONTHS[selectedWeek.endMonth - 1].text.slice(0, 3)} ${
-            selectedWeek.endYear
-          }`;
-    return result;
   };
 
   useEffect(() => {
@@ -210,32 +139,32 @@ const Week = ({
         onDragEnd={onDragEnd}
         enableDefaultSensors={isEditMode ? true : false}
       >
-        <div className="calendar-container">
-          <ViewSelector
+        {/* <div className="calendar-container"> */}
+        {/* <ViewSelector
             {...{ selectedView: 'Week', viewNames, setSelectedView }}
             handleChangePrevious={handlePreviousWeek}
             handleChangeNext={handleNextWeek}
             handleToday={handleToday}
           >
             <div className="dropdown dropbtn">{displayWeeks(selectedWeek)}</div>
-          </ViewSelector>
-          <div className="hours-weekdays-wrapper">
-            <div className="calendarWeekView">
-              {dayNames}
-              <Hours
-                {...{
-                  weekHours,
-                  handleCreate,
-                  handleEdit,
-                  eventsMatrix: eventsMatrix(fullDayEvents),
-                  weekEventsMatrix: eventsMatrix(hourEvents),
-                  isEditMode,
-                }}
-              />
-            </div>
+          </ViewSelector> */}
+        <div className="hours-weekdays-wrapper">
+          <div className="calendarWeekView">
+            {dayNames}
+            <Hours
+              {...{
+                weekHours,
+                handleCreate,
+                handleEdit,
+                eventsMatrix: eventsMatrix(fullDayEvents),
+                weekEventsMatrix: eventsMatrix(hourEvents),
+                isEditMode,
+              }}
+            />
           </div>
-          {/* <ModalPopUp /> */}
         </div>
+        {/* <ModalPopUp /> */}
+        {/* </div> */}
       </DragDropContext>
     </div>
   );
