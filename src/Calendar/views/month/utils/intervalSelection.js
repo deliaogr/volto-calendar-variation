@@ -80,7 +80,12 @@ const handleToday = (
   );
 };
 
-const displayMonth = (selectedMonth, setSelectedMonth, selectedYear) => (
+const displayMonth = (
+  selectedMonth,
+  setSelectedMonth,
+  selectedYear,
+  setIntervalForNewEvents,
+) => (
   <div className="dropdown">
     <button className="dropbtn">
       {selectedMonth?.text} {selectedYear}
@@ -91,7 +96,12 @@ const displayMonth = (selectedMonth, setSelectedMonth, selectedYear) => (
         <p
           key={`key-${index}`}
           onClick={() =>
-            onChangeMonth(MONTHS[month.key], selectedYear, setSelectedMonth)
+            onChangeMonth(
+              MONTHS[month.key],
+              selectedYear,
+              setSelectedMonth,
+              setIntervalForNewEvents,
+            )
           }
           className="dropdown-content-btn"
         >

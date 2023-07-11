@@ -48,7 +48,12 @@ const ViewSelector = ({
       >
         <img src="https://i.imgur.com/2gqThFI.png" alt="left-arrow" />
       </button>
-      {displayPeriod(selectedPeriod, setSelectedPeriod, selectedYear)}
+      {displayPeriod(
+        selectedPeriod,
+        setSelectedPeriod,
+        selectedYear,
+        setIntervalForNewEvents,
+      )}
       <button
         className="calendar-header-arrow-btn"
         onClick={() =>

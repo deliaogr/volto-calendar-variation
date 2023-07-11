@@ -18,28 +18,28 @@ const Calendar = ({
   allEventsInInterval: allEvents,
 }) => {
   const [selectedView, setSelectedView] = useState(INITIAL_VIEW);
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  // const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
   const View = views[selectedView];
-  const {
-    handleChangeNext,
-    handleChangePrevious,
-    handleToday,
-    selectInitialPeriod,
-    displayPeriod,
-  } = intervalSelectors[selectedView];
+  // const {
+  //   handleChangeNext,
+  //   handleChangePrevious,
+  //   handleToday,
+  //   selectInitialPeriod,
+  //   displayPeriod,
+  // } = intervalSelectors[selectedView];
 
-  const [selectedPeriod, setSelectedPeriod] = useState(selectInitialPeriod());
+  // const [selectedPeriod, setSelectedPeriod] = useState(selectInitialPeriod());
 
-  const setPeriod = (period) => {
-    console.log({ period });
-    setSelectedPeriod(period);
-  };
-  const setView = (view) => {
-    console.log({ view });
-    setSelectedView(view);
-    setSelectedPeriod(selectInitialPeriod());
-  };
+  // const setPeriod = (period) => {
+  //   console.log({ period });
+  //   setSelectedPeriod(period);
+  // };
+  // const setView = (view) => {
+  //   console.log({ view });
+  //   setSelectedView(view);
+  //   setSelectedPeriod(selectInitialPeriod());
+  // };
 
   // console.log('Calendar', { selectedView, selectedPeriod });
   // useEffect(() => {
@@ -55,7 +55,7 @@ const Calendar = ({
   return (
     <div>
       <div className="calendar-container">
-        <ViewSelector
+        {/* <ViewSelector
           {...{
             selectedView: 'Month',
             viewNames,
@@ -71,10 +71,11 @@ const Calendar = ({
             displayPeriod,
             setIntervalForNewEvents,
           }}
-        />
+        /> */}
         <View
           {...{
             selectedView,
+            setSelectedView,
             viewNames,
             // ModalPopUp,
             handleEdit,
@@ -84,8 +85,13 @@ const Calendar = ({
             // handleOpenModal,
             makeDefaultEvent,
             isEditMode,
-            selectedYear,
-            selectedPeriod,
+            // selectedYear,
+            // selectedPeriod,
+            // handleChangeNext,
+            // handleChangePrevious,
+            // handleToday,
+            // selectInitialPeriod,
+            // displayPeriod,
           }}
         />
       </div>

@@ -8,6 +8,16 @@ import moment from 'moment';
 import { removeDraggedEvent, addDroppedEvent } from '../helpers';
 import { makeInterval } from '../week/utils/makeInterval';
 import eventsMatrix from './utils/eventsMatrix';
+import { withViewSelector } from '../ViewSelector/withViewSelector';
+import { Month as intervalSelection } from './utils/intervalSelection';
+
+// const {
+//   handleChangeNext,
+//   handleChangePrevious,
+//   handleToday,
+//   selectInitialPeriod,
+//   displayPeriod,
+// } = intervalSelection;
 
 const Month = ({
   // ModalPopUp,
@@ -151,4 +161,4 @@ const Month = ({
   );
 };
 
-export default Month;
+export default withViewSelector(Month);
