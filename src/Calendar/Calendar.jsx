@@ -30,9 +30,22 @@ const Calendar = ({
   } = intervalSelectors[selectedView];
 
   const [selectedPeriod, setSelectedPeriod] = useState(selectInitialPeriod());
-  useEffect(() => setSelectedPeriod(selectInitialPeriod()), [
-    selectInitialPeriod,
-  ]);
+
+  const setPeriod = (period) => {
+    console.log({ period });
+    setSelectedPeriod(period);
+  };
+  const setView = (view) => {
+    console.log({ view });
+    setSelectedView(view);
+    setSelectedPeriod(selectInitialPeriod());
+  };
+
+  // console.log('Calendar', { selectedView, selectedPeriod });
+  // useEffect(() => {
+  //   console.log({ selectedView }, selectInitialPeriod());
+  //   setSelectedPeriod(selectInitialPeriod());
+  // }, [selectedView, selectInitialPeriod]);
 
   const handleEdit = (eventId) => {
     getCurrentEventById(eventId);
@@ -46,11 +59,11 @@ const Calendar = ({
           {...{
             selectedView: 'Month',
             viewNames,
-            setSelectedView,
+            setSelectedView: setView,
             selectedYear,
             setSelectedYear,
             selectedPeriod,
-            setSelectedPeriod,
+            setSelectedPeriod: setPeriod,
             handleChangePrevious,
             handleChangeNext,
             handleToday,
@@ -63,7 +76,6 @@ const Calendar = ({
           {...{
             selectedView,
             viewNames,
-            setSelectedView,
             // ModalPopUp,
             handleEdit,
             allEvents,

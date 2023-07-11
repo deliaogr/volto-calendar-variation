@@ -22,6 +22,7 @@ const onChangeWeek = (
 };
 
 const selectInitialWeek = () => {
+  // console.log(firstAndLastDayOfTheWeek(new Date()));
   return firstAndLastDayOfTheWeek(new Date());
 };
 

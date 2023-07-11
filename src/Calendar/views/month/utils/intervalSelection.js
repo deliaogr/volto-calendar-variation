@@ -7,6 +7,7 @@ const onChangeMonth = (
   setCurrentMonth,
   setIntervalForNewEvents,
 ) => {
+  // console.log('onChangeMonth', { monthSelection });
   setCurrentMonth(monthSelection);
   setIntervalForNewEvents(
     makeIntervalToFetchMonthEvents(monthSelection, year, []),
@@ -14,6 +15,7 @@ const onChangeMonth = (
 };
 
 const selectInitialMonth = () => {
+  // console.log('Month', MONTHS[new Date().getMonth()]);
   return MONTHS[new Date().getMonth()];
 };
 

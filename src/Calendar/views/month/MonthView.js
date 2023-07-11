@@ -22,9 +22,10 @@ const Month = ({
   selectedPeriod: selectedMonth,
   selectedYear,
 }) => {
-
+  // const monthIndex = new Date().getMonth();
+  // console.log({ selectedMonth });
   const [days, setDays] = useState(
-    fillCalendarDays(new Date().getMonth(), allEvents, selectedYear),
+    fillCalendarDays(selectedMonth.key, allEvents, selectedYear),
   );
 
   const [eventsMatrixState, setEventsMatrixState] = useState(
@@ -112,6 +113,7 @@ const Month = ({
   };
 
   useEffect(() => {
+    console.log({ selectedMonth });
     setIntervalForNewEvents(
       makeIntervalToFetchMonthEvents(selectedMonth, selectedYear, []),
     );
