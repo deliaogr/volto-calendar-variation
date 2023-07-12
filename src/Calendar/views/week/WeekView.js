@@ -8,6 +8,7 @@ import { makeInterval } from './utils/makeInterval';
 import { removeDraggedEvent, addDroppedEvent } from '../helpers';
 import moment from 'moment';
 import eventsMatrix from '../month/utils/eventsMatrix';
+import { withViewSelector } from '../ViewSelector/withViewSelector';
 
 const Week = ({
   // ModalPopUp,
@@ -18,7 +19,6 @@ const Week = ({
   makeDefaultEvent,
   isEditMode,
   allEvents = [],
-  // part of refactoring
   selectedPeriod: selectedWeek,
 }) => {
   const fullDayEvents = allEvents.filter((event) => event.startHour === null);
@@ -139,15 +139,6 @@ const Week = ({
         onDragEnd={onDragEnd}
         enableDefaultSensors={isEditMode ? true : false}
       >
-        {/* <div className="calendar-container"> */}
-        {/* <ViewSelector
-            {...{ selectedView: 'Week', viewNames, setSelectedView }}
-            handleChangePrevious={handlePreviousWeek}
-            handleChangeNext={handleNextWeek}
-            handleToday={handleToday}
-          >
-            <div className="dropdown dropbtn">{displayWeeks(selectedWeek)}</div>
-          </ViewSelector> */}
         <div className="hours-weekdays-wrapper">
           <div className="calendarWeekView">
             {dayNames}
@@ -170,4 +161,4 @@ const Week = ({
   );
 };
 
-export default Week;
+export default withViewSelector(Week);

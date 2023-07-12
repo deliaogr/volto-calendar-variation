@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './coursesCalendar.css';
 import * as views from './views';
 import { INITIAL_VIEW } from './constants';
-import ViewSelector from './views/ViewSelector/ViewSelector';
-import * as intervalSelectors from './views/ViewSelector/intervalSelectors';
 
 const viewNames = Object.keys(views);
 
@@ -18,34 +16,8 @@ const Calendar = ({
   allEventsInInterval: allEvents,
 }) => {
   const [selectedView, setSelectedView] = useState(INITIAL_VIEW);
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
   const View = views[selectedView];
-  const {
-    handleChangeNext,
-    handleChangePrevious,
-    handleToday,
-    selectInitialPeriod,
-    displayPeriod,
-  } = intervalSelectors[selectedView];
-
-  const [selectedPeriod, setSelectedPeriod] = useState(selectInitialPeriod());
-
-  const setPeriod = (period) => {
-    console.log({ period });
-    setSelectedPeriod(period);
-  };
-  const setView = (view) => {
-    console.log({ view });
-    setSelectedView(view);
-    setSelectedPeriod(selectInitialPeriod());
-  };
-
-  // console.log('Calendar', { selectedView, selectedPeriod });
-  // useEffect(() => {
-  //   console.log({ selectedView }, selectInitialPeriod());
-  //   setSelectedPeriod(selectInitialPeriod());
-  // }, [selectedView, selectInitialPeriod]);
 
   const handleEdit = (eventId) => {
     getCurrentEventById(eventId);
@@ -55,26 +27,10 @@ const Calendar = ({
   return (
     <div>
       <div className="calendar-container">
-        <ViewSelector
-          {...{
-            selectedView: 'Month',
-            viewNames,
-            setSelectedView: setView,
-            selectedYear,
-            setSelectedYear,
-            selectedPeriod,
-            setSelectedPeriod: setPeriod,
-            handleChangePrevious,
-            handleChangeNext,
-            handleToday,
-            selectInitialPeriod,
-            displayPeriod,
-            setIntervalForNewEvents,
-          }}
-        />
         <View
           {...{
             selectedView,
+            setSelectedView,
             viewNames,
             // ModalPopUp,
             handleEdit,
@@ -84,8 +40,6 @@ const Calendar = ({
             // handleOpenModal,
             makeDefaultEvent,
             isEditMode,
-            selectedYear,
-            selectedPeriod,
           }}
         />
       </div>

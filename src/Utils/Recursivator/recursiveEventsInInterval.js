@@ -1,3 +1,4 @@
+// unused
 const startDateEventStartDateIntervalDiff = (interval, event) => {
   const intervalStartTime = new Date(interval.startDate).getTime();
   const eventStartTime = new Date(event.startDate).getTime();

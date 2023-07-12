@@ -1,5 +1,6 @@
 import moment from 'moment';
 
+// difference between start of event and start of interval
 const startDateEventStartDateIntervalDiff = (interval, event) => {
   const intervalStartTime = new Date(interval.startDate).getTime();
   const eventStartTime = new Date(event.startDate).getTime();
@@ -8,6 +9,7 @@ const startDateEventStartDateIntervalDiff = (interval, event) => {
   return result;
 };
 
+// day in week index: Monday is 0, Sunday is 6
 const currentEventWeekIndex = (event) => {
   const result =
     new Date(event.startDate).getDay() === 0
@@ -16,12 +18,14 @@ const currentEventWeekIndex = (event) => {
   return result;
 };
 
+// create start date for the event
 const makeStartDate = (currentEvent, selectedInterval) => {
   const eventStartDate = new Date(currentEvent.startDate);
   const eventEndDate = new Date(currentEvent.endDate);
   const recurrenceEndDate = new Date(currentEvent.recurrenceEndDate) || null;
   const recurrenceInterval = currentEvent.recurrenceInterval;
 
+  // event starts at the same moment, or with a delay of difference + index ?
   eventStartDate.setTime(
     eventStartDate.getTime() +
       (startDateEventStartDateIntervalDiff(selectedInterval, currentEvent) > 0
@@ -40,6 +44,7 @@ const makeStartDate = (currentEvent, selectedInterval) => {
   };
 };
 
+// number of days between start and end of event
 const startDateEndDateDiff = (event) => {
   const result =
     (new Date(event.endDate).getTime() - new Date(event.startDate).getTime()) /
@@ -58,12 +63,14 @@ export const recursiveFunctions = {
 
     const generatedRecursiveEvents = [];
 
+    // create first event
     eventStartDate.setTime(eventStartDate.getTime());
     eventEndDate.setTime(
       eventStartDate.getTime() +
         startDateEndDateDiff(currentEvent) * 24 * 3600 * 1000,
     );
 
+    // check if created event is before end of recurrence
     if (
       new Date(eventStartDate).getTime() < new Date(recurrenceEndDate).getTime()
     ) {
@@ -74,6 +81,7 @@ export const recursiveFunctions = {
       });
     }
 
+    // create events until end of interval
     do {
       eventStartDate.setTime(
         eventStartDate.getTime() + 7 * 24 * 3600 * 1000 * recurrenceInterval,
@@ -112,6 +120,7 @@ export const recursiveFunctions = {
     const recurrenceInterval = currentEvent.recurrenceInterval;
 
     const intervalStartDate = new Date(selectedInterval.startDate);
+    // if event starts on the first day of the month, the new month will be the same, or we get the next month ?
     const intervalMonthAndYear =
       intervalStartDate.getDate() === 1
         ? {
@@ -132,6 +141,8 @@ export const recursiveFunctions = {
       eventStartDate.getTime() +
         startDateEndDateDiff(currentEvent) * 24 * 3600 * 1000,
     );
+
+    // create next event
     return new Date(eventStartDate).getTime() <
       new Date(recurrenceEndDate).getTime()
       ? [
@@ -151,6 +162,7 @@ export const recursiveFunctions = {
     const recurrenceEndDate = new Date(currentEvent.recurrenceEndDate);
     const recurrenceInterval = currentEvent.recurrenceInterval;
 
+    // ?
     const intervalYear =
       intervalStartDate.getDate() === 1 ||
       new Date(eventStartDate).getMonth() === intervalStartDate.getMonth()

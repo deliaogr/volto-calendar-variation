@@ -8,6 +8,7 @@ import moment from 'moment';
 import { removeDraggedEvent, addDroppedEvent } from '../helpers';
 import { makeInterval } from '../week/utils/makeInterval';
 import eventsMatrix from './utils/eventsMatrix';
+import { withViewSelector } from '../ViewSelector/withViewSelector';
 
 const Month = ({
   // ModalPopUp,
@@ -18,12 +19,9 @@ const Month = ({
   makeDefaultEvent,
   isEditMode,
   allEvents = [],
-  // part of refactoring
   selectedPeriod: selectedMonth,
   selectedYear,
 }) => {
-  // const monthIndex = new Date().getMonth();
-  // console.log({ selectedMonth });
   const [days, setDays] = useState(
     fillCalendarDays(selectedMonth.key, allEvents, selectedYear),
   );
@@ -113,7 +111,6 @@ const Month = ({
   };
 
   useEffect(() => {
-    console.log({ selectedMonth });
     setIntervalForNewEvents(
       makeIntervalToFetchMonthEvents(selectedMonth, selectedYear, []),
     );
@@ -151,4 +148,4 @@ const Month = ({
   );
 };
 
-export default Month;
+export default withViewSelector(Month);
