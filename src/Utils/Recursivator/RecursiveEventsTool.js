@@ -1,11 +1,8 @@
-// import { recursiveEventsInInterval } from '../Calendar/views/month/recursiveEventsInInterval';
 import { recursiveFunctions } from './recursiveFunctions';
 
 export const recursiveEventsTool = (recursiveEvents, selectedInterval) => {
-  //   const relevantRecursiveEvents = recursiveEvents.filter((event) =>
-  //     recursiveEventsInInterval(event, selectedInterval),
-  //   );
 
+  // we filter all recursive events in order to get the ones that start before the interval ends and end after the interval starts
   const relevantRecursiveEvents = recursiveEvents.filter(
     (event) =>
       new Date(event.startDate).getTime() <
@@ -13,6 +10,7 @@ export const recursiveEventsTool = (recursiveEvents, selectedInterval) => {
       new Date(event.recurrenceEndDate) > new Date(selectedInterval.startDate),
   );
 
+  // we create new events based on the recursion rules of each event
   const allRecursiveEvents = relevantRecursiveEvents.reduce(
     (acc, currentEvent) => {
       return [
