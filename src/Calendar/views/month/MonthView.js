@@ -9,15 +9,6 @@ import { removeDraggedEvent, addDroppedEvent } from '../helpers';
 import { makeInterval } from '../week/utils/makeInterval';
 import eventsMatrix from './utils/eventsMatrix';
 import { withViewSelector } from '../ViewSelector/withViewSelector';
-import { Month as intervalSelection } from './utils/intervalSelection';
-
-// const {
-//   handleChangeNext,
-//   handleChangePrevious,
-//   handleToday,
-//   selectInitialPeriod,
-//   displayPeriod,
-// } = intervalSelection;
 
 const Month = ({
   // ModalPopUp,
@@ -28,12 +19,9 @@ const Month = ({
   makeDefaultEvent,
   isEditMode,
   allEvents = [],
-  // part of refactoring
   selectedPeriod: selectedMonth,
   selectedYear,
 }) => {
-  // const monthIndex = new Date().getMonth();
-  // console.log({ selectedMonth });
   const [days, setDays] = useState(
     fillCalendarDays(selectedMonth.key, allEvents, selectedYear),
   );
@@ -123,7 +111,6 @@ const Month = ({
   };
 
   useEffect(() => {
-    console.log({ selectedMonth });
     setIntervalForNewEvents(
       makeIntervalToFetchMonthEvents(selectedMonth, selectedYear, []),
     );

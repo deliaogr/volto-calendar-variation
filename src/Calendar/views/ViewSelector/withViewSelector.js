@@ -27,7 +27,7 @@ export const withViewSelector = (WrappedComponent) => {
       <>
         <ViewSelector
           {...{
-            selectedView: 'Month',
+            selectedView,
             viewNames,
             setSelectedView,
             selectedYear,

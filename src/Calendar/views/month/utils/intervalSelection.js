@@ -7,7 +7,6 @@ const onChangeMonth = (
   setCurrentMonth,
   setIntervalForNewEvents,
 ) => {
-  // console.log('onChangeMonth', { monthSelection });
   setCurrentMonth(monthSelection);
   setIntervalForNewEvents(
     makeIntervalToFetchMonthEvents(monthSelection, year, []),
@@ -15,20 +14,29 @@ const onChangeMonth = (
 };
 
 const selectInitialMonth = () => {
-  // console.log('Month', MONTHS[new Date().getMonth()]);
   return MONTHS[new Date().getMonth()];
 };
 
-const setNextYear = (selectedYear, setSelectedYear, setCurrentMonth) => {
+const setNextYear = (
+  selectedYear,
+  setSelectedYear,
+  setCurrentMonth,
+  setIntervalForNewEvents,
+) => {
   const year = selectedYear + 1;
   setSelectedYear(year);
-  onChangeMonth(MONTHS[0], year, setCurrentMonth);
+  onChangeMonth(MONTHS[0], year, setCurrentMonth, setIntervalForNewEvents);
 };
 
-const setPreviousYear = (selectedYear, setSelectedYear, setCurrentMonth) => {
+const setPreviousYear = (
+  selectedYear,
+  setSelectedYear,
+  setCurrentMonth,
+  setIntervalForNewEvents,
+) => {
   const year = selectedYear - 1;
   setSelectedYear(year);
-  onChangeMonth(MONTHS[11], year, setCurrentMonth);
+  onChangeMonth(MONTHS[11], year, setCurrentMonth, setIntervalForNewEvents);
 };
 
 const handlePreviousMonth = (
@@ -45,7 +53,12 @@ const handlePreviousMonth = (
         setCurrentMonth,
         setIntervalForNewEvents,
       )
-    : setPreviousYear(selectedYear, setSelectedYear);
+    : setPreviousYear(
+        selectedYear,
+        setSelectedYear,
+        setCurrentMonth,
+        setIntervalForNewEvents,
+      );
 };
 
 const handleNextMonth = (
@@ -62,7 +75,12 @@ const handleNextMonth = (
         setCurrentMonth,
         setIntervalForNewEvents,
       )
-    : setNextYear(selectedYear, setSelectedYear);
+    : setNextYear(
+        selectedYear,
+        setSelectedYear,
+        setCurrentMonth,
+        setIntervalForNewEvents,
+      );
 };
 
 const handleToday = (
