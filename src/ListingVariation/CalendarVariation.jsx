@@ -2,13 +2,21 @@ import React, { useState, useEffect, useRef } from 'react';
 import moment from 'moment';
 import Calendar from '../Calendar/Calendar';
 import { formatEvents } from '../Utils/Connector';
-import { recursiveEventsTool } from '../Utils/Recursivator/RecursiveEventsTool';
+import { makeRecursiveEvents } from '../Utils/Recursivator/makeRecursiveEvents';
 /* 
   TODO: refactor:
   1. recursivator
   2. refactor views
   3. connector
 **/
+
+const isIncluded = (event, interval) => {
+  return (
+    new Date(event.startDate).getTime() <
+      new Date(interval.endDate).getTime() &&
+    new Date(event.recurrenceEndDate) > new Date(interval.startDate)
+  );
+};
 
 // TODO: rename
 const CalendarVariation = ({ items, isEditMode }) => {
@@ -23,8 +31,8 @@ const CalendarVariation = ({ items, isEditMode }) => {
 
   // TODO: refactor ?
   useEffect(() => {
-    let filteredEvents = items.filter((item) => item['@type'] === 'Event');
-    allEventsRef.current = formatEvents(filteredEvents);
+    let events = items.filter((item) => item['@type'] === 'Event');
+    allEventsRef.current = formatEvents(events);
   }, [items]);
 
   useEffect(() => {
@@ -43,11 +51,16 @@ const CalendarVariation = ({ items, isEditMode }) => {
           );
         }) || [];
 
-      const filteredRecursiveEvents =
-        allEventsRef.current.filter((event) => event.recursive !== 'no') || [];
+      // events received from BE will have information on recursion,
+      // we consider them templates, we select those in interval
+      // based on them we will generate new events
+      const recursiveEventTemplates =
+        allEventsRef.current.filter(
+          (event) => event.recursive !== 'no' && isIncluded(event, interval),
+        ) || [];
 
-      const recursiveEvents = recursiveEventsTool(
-        filteredRecursiveEvents,
+      const recursiveEvents = makeRecursiveEvents(
+        recursiveEventTemplates,
         interval,
       );
 

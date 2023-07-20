@@ -19,18 +19,18 @@ const currentEventWeekIndex = (event) => {
 };
 
 // create start date for the event
-const makeStartDate = (currentEvent, selectedInterval) => {
-  const eventStartDate = new Date(currentEvent.startDate);
-  const eventEndDate = new Date(currentEvent.endDate);
-  const recurrenceEndDate = new Date(currentEvent.recurrenceEndDate) || null;
-  const recurrenceInterval = currentEvent.recurrenceInterval;
+const makeStartDate = (eventTemplate, interval) => {
+  const eventStartDate = new Date(eventTemplate.startDate);
+  const eventEndDate = new Date(eventTemplate.endDate);
+  const recurrenceEndDate = new Date(eventTemplate.recurrenceEndDate) || null;
+  const recurrenceInterval = eventTemplate.recurrenceInterval;
 
-  // event starts at the same moment, or with a delay of difference + index ?
+  // calculate event start date in current interval
   eventStartDate.setTime(
     eventStartDate.getTime() +
-      (startDateEventStartDateIntervalDiff(selectedInterval, currentEvent) > 0
-        ? startDateEventStartDateIntervalDiff(selectedInterval, currentEvent) +
-          currentEventWeekIndex(currentEvent)
+      (startDateEventStartDateIntervalDiff(interval, eventTemplate) > 0
+        ? startDateEventStartDateIntervalDiff(interval, eventTemplate) +
+          currentEventWeekIndex(eventTemplate)
         : 0) *
         24 *
         3600 *
@@ -52,14 +52,14 @@ const startDateEndDateDiff = (event) => {
   return result;
 };
 
-export const recursiveFunctions = {
-  weekly(currentEvent, selectedInterval) {
+export const generateRecursiveEvents = {
+  weekly(eventTemplate, interval) {
     const {
       eventStartDate,
       eventEndDate,
       recurrenceEndDate,
       recurrenceInterval,
-    } = makeStartDate(currentEvent, selectedInterval);
+    } = makeStartDate(eventTemplate, interval);
 
     const generatedRecursiveEvents = [];
 
@@ -67,7 +67,7 @@ export const recursiveFunctions = {
     eventStartDate.setTime(eventStartDate.getTime());
     eventEndDate.setTime(
       eventStartDate.getTime() +
-        startDateEndDateDiff(currentEvent) * 24 * 3600 * 1000,
+        startDateEndDateDiff(eventTemplate) * 24 * 3600 * 1000,
     );
 
     // check if created event is before end of recurrence
@@ -75,7 +75,7 @@ export const recursiveFunctions = {
       new Date(eventStartDate).getTime() < new Date(recurrenceEndDate).getTime()
     ) {
       generatedRecursiveEvents.push({
-        ...currentEvent,
+        ...eventTemplate,
         startDate: moment(eventStartDate).format('YYYY-MM-DD'),
         endDate: moment(eventEndDate).format('YYYY-MM-DD'),
       });
@@ -90,7 +90,7 @@ export const recursiveFunctions = {
       eventStartDate.setHours(1, 0, 0, 0);
       eventEndDate.setTime(
         eventStartDate.getTime() +
-          startDateEndDateDiff(currentEvent) * 24 * 3600 * 1000,
+          startDateEndDateDiff(eventTemplate) * 24 * 3600 * 1000,
       );
 
       if (
@@ -98,38 +98,43 @@ export const recursiveFunctions = {
         new Date(recurrenceEndDate).getTime()
       ) {
         generatedRecursiveEvents.push({
-          ...currentEvent,
+          ...eventTemplate,
           startDate: moment(eventStartDate).format('YYYY-MM-DD'),
           endDate: moment(eventEndDate).format('YYYY-MM-DD'),
         });
       }
     } while (
-      new Date(selectedInterval.startDate).getTime() <
+      new Date(interval.startDate).getTime() <
         new Date(eventStartDate).getTime() &&
-      new Date(eventStartDate).getTime() <
-        new Date(selectedInterval.endDate).getTime()
+      new Date(eventStartDate).getTime() < new Date(interval.endDate).getTime()
     );
 
     return generatedRecursiveEvents;
   },
 
-  monthly(currentEvent, selectedInterval) {
-    const eventStartDate = new Date(currentEvent.startDate);
-    const eventEndDate = new Date(currentEvent.endDate);
-    const recurrenceEndDate = new Date(currentEvent.recurrenceEndDate);
-    const recurrenceInterval = currentEvent.recurrenceInterval;
+  // TODO: humanize selectedMonth first
+  monthly(eventTemplate, interval) {
+    const eventStartDate = new Date(eventTemplate.startDate);
+    const eventEndDate = new Date(eventTemplate.endDate);
+    const recurrenceEndDate = new Date(eventTemplate.recurrenceEndDate);
+    // TODO: explain what recurrenceInterval is
+    const recurrenceInterval = eventTemplate.recurrenceInterval;
 
-    const intervalStartDate = new Date(selectedInterval.startDate);
-    // if event starts on the first day of the month, the new month will be the same, or we get the next month ?
+    const intervalStartDate = new Date(interval.startDate);
     const intervalMonthAndYear =
+      // first day of interval is in current month
       intervalStartDate.getDate() === 1
         ? {
             month: intervalStartDate.getMonth(),
             year: intervalStartDate.getFullYear(),
           }
-        : intervalStartDate.getMonth() === 11
+        : // first day of interval is before current month
+        // previous month is December
+        intervalStartDate.getMonth() === 11
         ? { month: 0, year: intervalStartDate.getFullYear() + 1 }
-        : {
+        : // first day of interval is before current month, but not December
+          // year stays the same
+          {
             month: intervalStartDate.getMonth() + 1,
             year: intervalStartDate.getFullYear(),
           };
@@ -139,7 +144,7 @@ export const recursiveFunctions = {
 
     eventEndDate.setTime(
       eventStartDate.getTime() +
-        startDateEndDateDiff(currentEvent) * 24 * 3600 * 1000,
+        startDateEndDateDiff(eventTemplate) * 24 * 3600 * 1000,
     );
 
     // create next event
@@ -147,7 +152,7 @@ export const recursiveFunctions = {
       new Date(recurrenceEndDate).getTime()
       ? [
           {
-            ...currentEvent,
+            ...eventTemplate,
             startDate: moment(eventStartDate).format('YYYY-MM-DD'),
             endDate: moment(eventEndDate).format('YYYY-MM-DD'),
           },
@@ -155,12 +160,12 @@ export const recursiveFunctions = {
       : [];
   },
 
-  annually(currentEvent, selectedInterval) {
-    const eventStartDate = new Date(currentEvent.startDate);
-    const eventEndDate = new Date(currentEvent.endDate);
-    const intervalStartDate = new Date(selectedInterval.startDate);
-    const recurrenceEndDate = new Date(currentEvent.recurrenceEndDate);
-    const recurrenceInterval = currentEvent.recurrenceInterval;
+  annually(eventTemplate, interval) {
+    const eventStartDate = new Date(eventTemplate.startDate);
+    const eventEndDate = new Date(eventTemplate.endDate);
+    const intervalStartDate = new Date(interval.startDate);
+    const recurrenceEndDate = new Date(eventTemplate.recurrenceEndDate);
+    const recurrenceInterval = eventTemplate.recurrenceInterval;
 
     // ?
     const intervalYear =
@@ -174,14 +179,14 @@ export const recursiveFunctions = {
     eventStartDate.setFullYear(intervalYear * recurrenceInterval);
     eventEndDate.setTime(
       eventStartDate.getTime() +
-        startDateEndDateDiff(currentEvent) * 24 * 3600 * 1000,
+        startDateEndDateDiff(eventTemplate) * 24 * 3600 * 1000,
     );
 
     return new Date(eventStartDate).getTime() <
       new Date(recurrenceEndDate).getTime()
       ? [
           {
-            ...currentEvent,
+            ...eventTemplate,
             startDate: moment(eventStartDate).format('YYYY-MM-DD'),
             endDate: moment(eventEndDate).format('YYYY-MM-DD'),
           },
@@ -189,27 +194,27 @@ export const recursiveFunctions = {
       : [];
   },
 
-  daily(currentEvent, selectedInterval) {
+  daily(eventTemplate, interval) {
     const {
       eventStartDate,
       eventEndDate,
       recurrenceEndDate,
       recurrenceInterval,
-    } = makeStartDate(currentEvent, selectedInterval);
+    } = makeStartDate(eventTemplate, interval);
 
     const generatedRecursiveEvents = [];
 
     eventStartDate.setTime(eventStartDate.getTime());
     eventEndDate.setTime(
       eventStartDate.getTime() +
-        startDateEndDateDiff(currentEvent) * 24 * 3600 * 1000,
+        startDateEndDateDiff(eventTemplate) * 24 * 3600 * 1000,
     );
 
     if (
       new Date(eventStartDate).getTime() < new Date(recurrenceEndDate).getTime()
     ) {
       generatedRecursiveEvents.push({
-        ...currentEvent,
+        ...eventTemplate,
         startDate: moment(eventStartDate).format('YYYY-MM-DD'),
         endDate: moment(eventEndDate).format('YYYY-MM-DD'),
       });
@@ -223,7 +228,7 @@ export const recursiveFunctions = {
       eventStartDate.setHours(1, 0, 0, 0);
       eventEndDate.setTime(
         eventStartDate.getTime() +
-          startDateEndDateDiff(currentEvent) * 24 * 3600 * 1000,
+          startDateEndDateDiff(eventTemplate) * 24 * 3600 * 1000,
       );
 
       if (
@@ -231,41 +236,40 @@ export const recursiveFunctions = {
         new Date(recurrenceEndDate).getTime()
       ) {
         generatedRecursiveEvents.push({
-          ...currentEvent,
+          ...eventTemplate,
           startDate: moment(eventStartDate).format('YYYY-MM-DD'),
           endDate: moment(eventEndDate).format('YYYY-MM-DD'),
         });
       }
     } while (
-      new Date(selectedInterval.startDate).getTime() <
+      new Date(interval.startDate).getTime() <
         new Date(eventStartDate).getTime() &&
-      new Date(eventStartDate).getTime() <
-        new Date(selectedInterval.endDate).getTime()
+      new Date(eventStartDate).getTime() < new Date(interval.endDate).getTime()
     );
     return generatedRecursiveEvents;
   },
 
-  hourly(currentEvent, selectedInterval) {
+  hourly(eventTemplate, interval) {
     const {
       eventStartDate,
       eventEndDate,
       recurrenceEndDate,
       recurrenceInterval,
-    } = makeStartDate(currentEvent, selectedInterval);
+    } = makeStartDate(eventTemplate, interval);
 
     const generatedRecursiveEvents = [];
 
     eventStartDate.setTime(eventStartDate.getTime());
     eventEndDate.setTime(
       eventStartDate.getTime() +
-        startDateEndDateDiff(currentEvent) * 3600 * 1000,
+        startDateEndDateDiff(eventTemplate) * 3600 * 1000,
     );
 
     if (
       new Date(eventStartDate).getTime() < new Date(recurrenceEndDate).getTime()
     ) {
       generatedRecursiveEvents.push({
-        ...currentEvent,
+        ...eventTemplate,
         startDate: moment(eventStartDate).format('YYYY-MM-DD'),
         endDate: moment(eventEndDate).format('YYYY-MM-DD'),
       });
@@ -277,7 +281,7 @@ export const recursiveFunctions = {
       );
       eventEndDate.setTime(
         eventStartDate.getTime() +
-          startDateEndDateDiff(currentEvent) * 3600 * 1000,
+          startDateEndDateDiff(eventTemplate) * 3600 * 1000,
       );
 
       if (
@@ -285,41 +289,41 @@ export const recursiveFunctions = {
         new Date(recurrenceEndDate).getTime()
       ) {
         generatedRecursiveEvents.push({
-          ...currentEvent,
+          ...eventTemplate,
           startDate: moment(eventStartDate).format('YYYY-MM-DD'),
           endDate: moment(eventEndDate).format('YYYY-MM-DD'),
         });
       }
     } while (
-      new Date(selectedInterval.startDate).getTime() <
+      new Date(interval.startDate).getTime() <
         new Date(eventStartDate).getTime() &&
-      new Date(eventStartDate).getTime() <
-        new Date(selectedInterval.endDate).getTime()
+      new Date(eventStartDate).getTime() < new Date(interval.endDate).getTime()
     );
 
     return generatedRecursiveEvents;
   },
 
-  minutely(currentEvent, selectedInterval) {
+  minutely(eventTemplate, interval) {
     const {
       eventStartDate,
       eventEndDate,
       recurrenceEndDate,
       recurrenceInterval,
-    } = makeStartDate(currentEvent, selectedInterval);
+    } = makeStartDate(eventTemplate, interval);
 
     const generatedRecursiveEvents = [];
 
     eventStartDate.setTime(eventStartDate.getTime());
     eventEndDate.setTime(
-      eventStartDate.getTime() + startDateEndDateDiff(currentEvent) * 60 * 1000,
+      eventStartDate.getTime() +
+        startDateEndDateDiff(eventTemplate) * 60 * 1000,
     );
 
     if (
       new Date(eventStartDate).getTime() < new Date(recurrenceEndDate).getTime()
     ) {
       generatedRecursiveEvents.push({
-        ...currentEvent,
+        ...eventTemplate,
         startDate: moment(eventStartDate).format('YYYY-MM-DD'),
         endDate: moment(eventEndDate).format('YYYY-MM-DD'),
       });
@@ -331,7 +335,7 @@ export const recursiveFunctions = {
       );
       eventEndDate.setTime(
         eventStartDate.getTime() +
-          startDateEndDateDiff(currentEvent) * 60 * 1000,
+          startDateEndDateDiff(eventTemplate) * 60 * 1000,
       );
 
       if (
@@ -339,41 +343,40 @@ export const recursiveFunctions = {
         new Date(recurrenceEndDate).getTime()
       ) {
         generatedRecursiveEvents.push({
-          ...currentEvent,
+          ...eventTemplate,
           startDate: moment(eventStartDate).format('YYYY-MM-DD'),
           endDate: moment(eventEndDate).format('YYYY-MM-DD'),
         });
       }
     } while (
-      new Date(selectedInterval.startDate).getTime() <
+      new Date(interval.startDate).getTime() <
         new Date(eventStartDate).getTime() &&
-      new Date(eventStartDate).getTime() <
-        new Date(selectedInterval.endDate).getTime()
+      new Date(eventStartDate).getTime() < new Date(interval.endDate).getTime()
     );
 
     return generatedRecursiveEvents;
   },
 
-  secondly(currentEvent, selectedInterval) {
+  secondly(eventTemplate, interval) {
     const {
       eventStartDate,
       eventEndDate,
       recurrenceEndDate,
       recurrenceInterval,
-    } = makeStartDate(currentEvent, selectedInterval);
+    } = makeStartDate(eventTemplate, interval);
 
     const generatedRecursiveEvents = [];
 
     eventStartDate.setTime(eventStartDate.getTime());
     eventEndDate.setTime(
-      eventStartDate.getTime() + startDateEndDateDiff(currentEvent) * 1000,
+      eventStartDate.getTime() + startDateEndDateDiff(eventTemplate) * 1000,
     );
 
     if (
       new Date(eventStartDate).getTime() < new Date(recurrenceEndDate).getTime()
     ) {
       generatedRecursiveEvents.push({
-        ...currentEvent,
+        ...eventTemplate,
         startDate: moment(eventStartDate).format('YYYY-MM-DD'),
         endDate: moment(eventEndDate).format('YYYY-MM-DD'),
       });
@@ -384,7 +387,7 @@ export const recursiveFunctions = {
         eventStartDate.getTime() + 1000 * recurrenceInterval,
       );
       eventEndDate.setTime(
-        eventStartDate.getTime() + startDateEndDateDiff(currentEvent) * 1000,
+        eventStartDate.getTime() + startDateEndDateDiff(eventTemplate) * 1000,
       );
 
       if (
@@ -392,16 +395,15 @@ export const recursiveFunctions = {
         new Date(recurrenceEndDate).getTime()
       ) {
         generatedRecursiveEvents.push({
-          ...currentEvent,
+          ...eventTemplate,
           startDate: moment(eventStartDate).format('YYYY-MM-DD'),
           endDate: moment(eventEndDate).format('YYYY-MM-DD'),
         });
       }
     } while (
-      new Date(selectedInterval.startDate).getTime() <
+      new Date(interval.startDate).getTime() <
         new Date(eventStartDate).getTime() &&
-      new Date(eventStartDate).getTime() <
-        new Date(selectedInterval.endDate).getTime()
+      new Date(eventStartDate).getTime() < new Date(interval.endDate).getTime()
     );
 
     return generatedRecursiveEvents;
