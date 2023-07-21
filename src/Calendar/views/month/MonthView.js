@@ -5,7 +5,6 @@ import Days from './Days';
 import { makeIntervalToFetchMonthEvents } from './utils/makeIntervalToFetchMonthEvents';
 import { fillCalendarDays } from './utils/fillCalendarDays';
 import moment from 'moment';
-// import { removeDraggedEvent, addDroppedEvent } from '../helpers';
 import { onDragEnd } from '../helpers';
 import { makeInterval } from '../week/utils/makeInterval';
 import eventsMatrix from './utils/eventsMatrix';
@@ -81,7 +80,6 @@ const Month = ({
   return (
     <div>
       <DragDropContext
-        // onDragEnd={onDragEnd}
         onDragEnd={(dragResult) =>
           onDragEnd(dragResult, days, setDays, updateEvent, updateEventDates)
         }

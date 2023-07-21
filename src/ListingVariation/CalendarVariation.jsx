@@ -20,8 +20,6 @@ const isIncluded = (event, interval) => {
 
 // TODO: rename
 const CalendarVariation = ({ items, isEditMode }) => {
-  // const [normalEvents, setNormalEvents] = useState([]);
-  // const [recursiveEvents, setRecursiveEvents] = useState([]);
   const allEventsRef = useRef([]);
 
   const [allEventsInInterval, setAllEventsInInterval] = useState([]);

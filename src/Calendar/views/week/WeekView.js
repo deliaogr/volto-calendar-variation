@@ -5,7 +5,6 @@ import { firstAndLastDayOfTheWeek } from './utils/firstAndLastDayOfTheWeek';
 import { fillCalendarDays } from './utils/fillCalendarDays';
 import Hours from './Hours';
 import { makeInterval } from './utils/makeInterval';
-// import { removeDraggedEvent, addDroppedEvent } from '../helpers';
 import { onDragEnd } from '../helpers';
 import moment from 'moment';
 import eventsMatrix from '../month/utils/eventsMatrix';
@@ -143,7 +142,6 @@ const Week = ({
           </div>
         </div>
         {/* <ModalPopUp /> */}
-        {/* </div> */}
       </DragDropContext>
     </div>
   );

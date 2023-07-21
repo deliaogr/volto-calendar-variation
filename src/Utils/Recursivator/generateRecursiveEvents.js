@@ -117,7 +117,7 @@ export const generateRecursiveEvents = {
     const eventStartDate = new Date(eventTemplate.startDate);
     const eventEndDate = new Date(eventTemplate.endDate);
     const recurrenceEndDate = new Date(eventTemplate.recurrenceEndDate);
-    // TODO: explain what recurrenceInterval is
+    // represents the number of months between two consecutive events
     const recurrenceInterval = eventTemplate.recurrenceInterval;
 
     const intervalStartDate = new Date(interval.startDate);
