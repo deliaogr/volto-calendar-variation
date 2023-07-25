@@ -2,10 +2,18 @@ import moment from 'moment';
 import { flattenToAppURL } from '@plone/volto/helpers';
 import { rrulestr } from 'rrule';
 
+const calculateCount = (event, rrule, recurrenceEndDate) => {
+  let startDate = new Date(event.start);
+  const recurrenceDates = rrule.between(startDate, recurrenceEndDate, true);
+
+  // the + 1 adds the template event alongside the generated ones
+  return recurrenceDates.length + 1;
+};
+
 export const formatEvents = (events) => {
   let formattedEvents = events.map((event) => {
     let freqValue = null;
-    let recurrenceEndDate = null;
+    let recurrenceCount = null;
     let recurrenceInterval = null;
 
     if (event.recurrence) {
@@ -15,22 +23,13 @@ export const formatEvents = (events) => {
 
       const rrule = rrulestr(event.recurrence);
 
-      recurrenceInterval = rrule.options.interval || null;
-      const recurrenceCount = rrule.options.count || null;
+      recurrenceInterval = rrule.options.interval || 1;
+      const recurrenceEndDate = rrule.options.until || null;
 
-      const timeIncrementValue =
-        freqValue === 'monthly' ? 'M' : freqValue.slice(0, 1).toLowerCase();
-
-      const calculatedEndDate =
-        recurrenceCount &&
-        moment(new Date(event.end)).add(
-          recurrenceInterval * recurrenceCount - 1,
-          timeIncrementValue,
-        );
-
-      // TODO: always return count
-      recurrenceEndDate =
-        rrule.options.until || calculatedEndDate.toDate() || null;
+      const calculatedCount = recurrenceEndDate
+        ? calculateCount(event, rrule, recurrenceEndDate)
+        : null;
+      recurrenceCount = rrule.options.count || calculatedCount;
     }
 
     const startDateTime = new Date(event.start);
@@ -52,8 +51,8 @@ export const formatEvents = (events) => {
       url: flattenToAppURL(event['@id']),
       id: Math.floor(Math.random() * 100),
       recursive: freqValue ? freqValue.toLowerCase() : 'no',
-      recurrenceEndDate: moment(recurrenceEndDate).format('YYYY-MM-DD') || null,
-      recurrenceInterval: recurrenceInterval || 1,
+      recurrenceCount,
+      recurrenceInterval,
     };
   });
 
