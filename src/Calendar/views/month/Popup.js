@@ -4,7 +4,7 @@ import moment from 'moment';
 
 const Popup = ({
   events,
-  setIsOpen,
+  setIsPopupOpen,
   dayForPopUp,
   monthForPopUp,
   yearForPopUp,
@@ -45,9 +45,12 @@ const Popup = ({
   };
 
   return (
-    <div className="popup-box" onClick={() => setIsOpen(false)}>
+    <div className="popup-box" onClick={() => setIsPopupOpen(false)}>
       <div className="box" onClick={(e) => e.stopPropagation()}>
-        <button className="pop-up-close-btn" onClick={() => setIsOpen(false)}>
+        <button
+          className="pop-up-close-btn"
+          onClick={() => setIsPopupOpen(false)}
+        >
           ⨉
         </button>
         <p className="pop-up-month">

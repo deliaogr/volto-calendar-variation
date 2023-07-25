@@ -13,11 +13,10 @@ const Day = ({
   eventsMatrix = {},
   isEditMode,
 }) => {
-  // TODO: rename
-  const [isOpen, setIsOpen] = useState(false);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   const togglePopup = () => {
-    setIsOpen(!isOpen);
+    setIsPopupOpen(!isPopupOpen);
   };
 
   // TODO: rename
@@ -253,11 +252,11 @@ const Day = ({
                 >
                   + see more
                 </button>
-                {isOpen && (
+                {isPopupOpen && (
                   <Popup
                     {...{
                       events: Object.values(eventsMatrix?.[date]),
-                      setIsOpen: togglePopup,
+                      setIsPopupOpen: togglePopup,
                       monthForPopUp: day.month,
                       dayForPopUp: day.dayNumber,
                       yearForPopUp: day.year,

@@ -100,6 +100,7 @@ const addDayNewEventNew = (
 // isEventFromPreviousDay
 const isDayNewEventOld = (acc, eventStartDate, index, currentEvent) => {
   // check if event exists on previous day
+  // previousDay
   const a = acc[`${addToStartDate(eventStartDate, index - 1)}`];
   if (a) {
     return Object.values(a).includes(currentEvent);
@@ -120,7 +121,7 @@ const nextFreeIndex = (startEndDateDiff, eventsMatrixDay, eventStartDate) => {
           addToStartDate(eventStartDate, index),
         )
       ) {
-        // the highest index is the index of the day with the event + 1
+        // the highest index is the index of the event in day + 1
         const highestDayIndex =
           parseInt(
             Object.keys(

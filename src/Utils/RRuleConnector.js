@@ -28,6 +28,7 @@ export const formatEvents = (events) => {
           timeIncrementValue,
         );
 
+      // TODO: always return count
       recurrenceEndDate =
         rrule.options.until || calculatedEndDate.toDate() || null;
     }

@@ -9,6 +9,8 @@ export const makeInterval = (
   endDay,
 ) => {
   return {
+    startMonth,
+    endMonth,
     startDate: moment([startYear, startMonth, startDay]),
     endDate: moment([endYear, endMonth, endDay]),
   };

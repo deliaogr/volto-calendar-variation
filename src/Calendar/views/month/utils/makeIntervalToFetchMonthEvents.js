@@ -25,6 +25,7 @@ export const makeIntervalToFetchMonthEvents = (
     dayNumber: dayNumberForNextMonth,
   } = nextDisabledDays[nextDisabledDays.length - 1];
   return {
+    selectedMonth,
     startDate: yearForPreviousMonth
       ? moment([
           yearForPreviousMonth,

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import moment from 'moment';
 import Calendar from '../Calendar/Calendar';
-import { formatEvents } from '../Utils/Connector';
+import { formatEvents } from '../Utils/RRuleConnector';
 import { makeRecursiveEvents } from '../Utils/Recursivator/makeRecursiveEvents';
 /* 
   TODO: refactor:
@@ -10,16 +10,15 @@ import { makeRecursiveEvents } from '../Utils/Recursivator/makeRecursiveEvents';
   3. connector
 **/
 
-const isIncluded = (event, interval) => {
-  return (
-    new Date(event.startDate).getTime() <
-      new Date(interval.endDate).getTime() &&
-    new Date(event.recurrenceEndDate) > new Date(interval.startDate)
+// should not end before interval or start after interval
+const isPossiblyRelevant = (event, interval) => {
+  return !(
+    new Date(event.recurrenceEndDate) < new Date(interval.startDate) ||
+    new Date(interval.endDate) < new Date(event.startDate)
   );
 };
 
-// TODO: rename
-const CalendarVariation = ({ items, isEditMode }) => {
+const ListingVariation = ({ items, isEditMode }) => {
   const allEventsRef = useRef([]);
 
   const [allEventsInInterval, setAllEventsInInterval] = useState([]);
@@ -27,7 +26,6 @@ const CalendarVariation = ({ items, isEditMode }) => {
 
   let defaultEvent = {};
 
-  // TODO: refactor ?
   useEffect(() => {
     let events = items.filter((item) => item['@type'] === 'Event');
     allEventsRef.current = formatEvents(events);
@@ -54,7 +52,8 @@ const CalendarVariation = ({ items, isEditMode }) => {
       // based on them we will generate new events
       const recursiveEventTemplates =
         allEventsRef.current.filter(
-          (event) => event.recursive !== 'no' && isIncluded(event, interval),
+          (event) =>
+            event.recursive !== 'no' && isPossiblyRelevant(event, interval),
         ) || [];
 
       const recursiveEvents = makeRecursiveEvents(
@@ -82,7 +81,6 @@ const CalendarVariation = ({ items, isEditMode }) => {
     //   endHour: eventData.endHour ? eventData.endHour : null,
     //   recursive: eventData.recursive,
     // });
-    console.log('event moved');
   };
 
   const getCurrentEventById = (eventId) => {
@@ -113,4 +111,4 @@ const CalendarVariation = ({ items, isEditMode }) => {
   );
 };
 
-export default CalendarVariation;
+export default ListingVariation;
