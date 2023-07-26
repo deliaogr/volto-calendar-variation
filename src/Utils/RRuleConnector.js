@@ -2,59 +2,94 @@ import moment from 'moment';
 import { flattenToAppURL } from '@plone/volto/helpers';
 import { rrulestr } from 'rrule';
 
-const calculateCount = (event, rrule, recurrenceEndDate) => {
-  let startDate = new Date(event.start);
-  const recurrenceDates = rrule.between(startDate, recurrenceEndDate, true);
+/**
+ *
+ * @param {Object} event
+ * @param {string} event.recurrence
+ * @returns {Object}
+ */
+const addRecurrenceProperty = (event) => {
+  if (!event.recurrence) return {};
 
-  // the + 1 adds the template event alongside the generated ones
-  return recurrenceDates.length + 1;
+  const freqIndex = event.recurrence.indexOf('FREQ=');
+  const semicolonIndex = event.recurrence.indexOf(';', freqIndex);
+  const recursionType = event.recurrence.substring(
+    freqIndex + 5,
+    semicolonIndex,
+  );
+  const recursive = recursionType.toLowerCase();
+
+  return { recursive };
 };
 
-export const formatEvents = (events) => {
-  let formattedEvents = events.map((event) => {
-    let freqValue = null;
-    let recurrenceCount = null;
-    let recurrenceInterval = null;
+const makeDefaultEvent = (event) => {
+  const startDateTime = new Date(event.start);
+  const endDateTime = new Date(event.end);
+  const startHour = startDateTime.getHours().toString().padStart(2, '0');
+  const startMinutes = startDateTime.getMinutes().toString().padStart(2, '0');
+  const endHour = endDateTime.getHours().toString().padStart(2, '0');
+  const endMinutes = endDateTime.getMinutes().toString().padStart(2, '0');
 
-    if (event.recurrence) {
-      const freqIndex = event.recurrence.indexOf('FREQ=');
-      const semicolonIndex = event.recurrence.indexOf(';', freqIndex);
-      freqValue = event.recurrence.substring(freqIndex + 5, semicolonIndex);
+  const isFullDayEvent = event.whole_day ? true : false;
 
-      const rrule = rrulestr(event.recurrence);
+  return {
+    title: event.title,
+    startDate: moment(startDateTime).format('YYYY-MM-DD'),
+    endDate: moment(endDateTime).format('YYYY-MM-DD'),
+    startHour: isFullDayEvent ? null : `${startHour}:${startMinutes}`,
+    endHour: isFullDayEvent ? null : `${endHour}:${endMinutes}`,
+    url: flattenToAppURL(event['@id']),
+    id: Math.floor(Math.random() * 100),
+    recursive: 'no',
+  };
+};
 
-      recurrenceInterval = rrule.options.interval || 1;
-      const recurrenceEndDate = rrule.options.until || null;
+const formatRecursiveRelevantEvents = (event, interval) => {
+  const rrule = rrulestr(event.recurrence);
 
-      const calculatedCount = recurrenceEndDate
-        ? calculateCount(event, rrule, recurrenceEndDate)
-        : null;
-      recurrenceCount = rrule.options.count || calculatedCount;
-    }
+  const recurrenceDates = rrule.between(
+    interval.startDate.toDate(),
+    interval.endDate.toDate(),
+  );
 
-    const startDateTime = new Date(event.start);
-    const endDateTime = new Date(event.end);
+  if (recurrenceDates.length === 0) return [];
 
-    const startHour = startDateTime.getHours().toString().padStart(2, '0');
-    const startMinutes = startDateTime.getMinutes().toString().padStart(2, '0');
-    const endHour = endDateTime.getHours().toString().padStart(2, '0');
-    const endMinutes = endDateTime.getMinutes().toString().padStart(2, '0');
+  const firstRecursiveEvent = {
+    ...makeDefaultEvent(event),
+    ...addRecurrenceProperty(event),
+  };
 
-    const isFullDayEvent = event.whole_day ? true : false;
+  const eventTimeSpan =
+    new Date(firstRecursiveEvent.endDate).getTime() -
+    new Date(firstRecursiveEvent.startDate).getTime();
 
+  return recurrenceDates.map((date) => {
+    const startDate = date;
+    const endDate = new Date(startDate.getTime() + eventTimeSpan);
     return {
-      title: event.title,
-      startDate: moment(startDateTime).format('YYYY-MM-DD'),
-      endDate: moment(endDateTime).format('YYYY-MM-DD'),
-      startHour: isFullDayEvent ? null : `${startHour}:${startMinutes}`,
-      endHour: isFullDayEvent ? null : `${endHour}:${endMinutes}`,
-      url: flattenToAppURL(event['@id']),
-      id: Math.floor(Math.random() * 100),
-      recursive: freqValue ? freqValue.toLowerCase() : 'no',
-      recurrenceCount,
-      recurrenceInterval,
+      ...firstRecursiveEvent,
+      startDate: moment(startDate).format('YYYY-MM-DD'),
+      endDate: moment(endDate).format('YYYY-MM-DD'),
     };
   });
+};
 
-  return formattedEvents;
+const formatDefaultRelevantEvent = (event, interval) => {
+  const isRelevant = moment(event.start).isBetween(
+    interval.startDate,
+    interval.endDate,
+    undefined,
+    '[]',
+  );
+
+  return isRelevant ? [makeDefaultEvent(event)] : [];
+};
+
+export const formatEventsForInterval = (events = [], interval) => {
+  return events.reduce((acc, currentEvent) => {
+    const result = !currentEvent.recurrence
+      ? formatDefaultRelevantEvent(currentEvent, interval)
+      : formatRecursiveRelevantEvents(currentEvent, interval);
+    return [...acc, ...result];
+  }, []);
 };

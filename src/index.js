@@ -1,5 +1,5 @@
 import calendarSVG from '@plone/volto/icons/calendar.svg';
-import ListingVariation from './ListingVariation/ListingVariation';
+import { CalendarVariation } from './CalendarVariation';
 import CalendarView from './Block/View';
 import CalendarEdit from './Block/Edit';
 import CalendarBlockSchema from './Block/schema';
@@ -29,7 +29,7 @@ const applyConfig = (config) => {
       isDefault: false,
       fullobjects: true,
       title: 'Calendar',
-      template: ListingVariation,
+      template: CalendarVariation,
       /* use schemaEnhancer to add fields of CalendarBlock here */
       schemaEnhancer: ({ schema, formData, intl }) => {
         const blockSchema = CalendarBlockSchema(intl);
