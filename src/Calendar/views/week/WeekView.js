@@ -10,27 +10,29 @@ import moment from 'moment';
 import eventsMatrix from '../month/utils/eventsMatrix';
 import { withViewSelector } from '../ViewSelector/withViewSelector';
 
+// TODO: bug: daily event is missing a day
 const Week = ({
   // ModalPopUp,
   handleEdit,
-  setIntervalForNewEvents,
+  setInterval,
   updateEvent,
   // handleOpenModal,
   makeDefaultEvent,
   isEditMode,
-  allEvents = [],
+  events = [],
   selectedPeriod: selectedWeek,
 }) => {
-  const fullDayEvents = allEvents.filter((event) => event.startHour === null);
-  const hourEvents = allEvents.filter((event) => event.startHour !== null);
+  const fullDayEvents = events.filter((event) => event.startHour === null);
+  const hourEvents = events.filter((event) => event.startHour !== null);
 
   const [weekHours, setWeekHours] = useState(
-    fillCalendarDays(allEvents, firstAndLastDayOfTheWeek(new Date())),
+    fillCalendarDays(events, firstAndLastDayOfTheWeek(new Date())),
   );
 
-  const [eventsMatrixState, setEventsMatrixState] = useState(
-    eventsMatrix(fullDayEvents),
-  );
+  // TODO: investigate if used
+  // const [eventsMatrixState, setEventsMatrixState] = useState(
+  //   eventsMatrix(fullDayEvents),
+  // );
 
   const dayNames = DAYS_OF_THE_WEEK_WEEK_VIEW.map((dayOfTheWeek, i) => {
     return i === 0 ? (
@@ -75,16 +77,17 @@ const Week = ({
   };
 
   const handleCreate = (year, month, day, startHour) => {
-    makeDefaultEvent({
-      ...makeInterval(year, month, day, year, month, day),
-      startHour: moment(startHour, 'HH:mm'),
-    });
+    // makeDefaultEvent({
+    //   ...makeInterval(year, month, day, year, month, day),
+    //   startHour: moment(startHour, 'HH:mm'),
+    // });
     // handleOpenModal();
   };
 
   useEffect(() => {
-    setIntervalForNewEvents(
+    setInterval(
       makeInterval(
+        // TODO: remove - 1, use value in parent instead of key
         selectedWeek.startYear,
         selectedWeek.startMonth - 1,
         selectedWeek.startDay,
@@ -98,7 +101,8 @@ const Week = ({
   useEffect(() => {
     setWeekHours(
       fillCalendarDays(
-        allEvents,
+        events,
+        // TODO: rename
         firstAndLastDayOfTheWeek(
           new Date(
             `${selectedWeek.startYear}/${selectedWeek.startMonth}/${selectedWeek.startDay}`,
@@ -106,11 +110,8 @@ const Week = ({
         ),
       ),
     );
-  }, [allEvents, selectedWeek]);
-
-  useEffect(() => {
-    setEventsMatrixState(eventsMatrix(allEvents));
-  }, [allEvents]);
+    // setEventsMatrixState(eventsMatrix(events));
+  }, [events, selectedWeek]);
 
   return (
     <div>

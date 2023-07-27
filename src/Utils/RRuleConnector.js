@@ -8,6 +8,7 @@ import { rrulestr } from 'rrule';
  * @param {string} event.recurrence
  * @returns {Object}
  */
+// TODO: consider returning recurrence also
 const addRecurrenceProperty = (event) => {
   if (!event.recurrence) return {};
 
@@ -63,6 +64,9 @@ const formatRecursiveRelevantEvents = (event, interval) => {
     new Date(firstRecursiveEvent.endDate).getTime() -
     new Date(firstRecursiveEvent.startDate).getTime();
 
+  // recurrenceDates is an array of all dates generated using the recurrence rule
+  // but only the startDate
+  // we use the original event and only update the start and end dates for each recurrent event
   return recurrenceDates.map((date) => {
     const startDate = date;
     const endDate = new Date(startDate.getTime() + eventTimeSpan);

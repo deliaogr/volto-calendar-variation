@@ -8,12 +8,12 @@ const viewNames = Object.keys(views);
 const Calendar = ({
   // ModalPopUp,
   // handleOpenModal,
-  setIntervalForNewEvents,
+  setInterval,
   getCurrentEventById,
   makeDefaultEvent,
   updateEvent,
   isEditMode,
-  allEventsInInterval: allEvents,
+  eventsInInterval: events,
 }) => {
   const [selectedView, setSelectedView] = useState(INITIAL_VIEW);
 
@@ -34,8 +34,8 @@ const Calendar = ({
             viewNames,
             // ModalPopUp,
             handleEdit,
-            allEvents,
-            setIntervalForNewEvents,
+            events,
+            setInterval,
             updateEvent,
             // handleOpenModal,
             makeDefaultEvent,

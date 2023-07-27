@@ -12,7 +12,7 @@ const ViewSelector = ({
   setSelectedYear,
   setSelectedPeriod,
   displayPeriod,
-  setIntervalForNewEvents,
+  setInterval,
 }) => {
   const viewSelect = (
     <div className="dropdown">
@@ -40,7 +40,7 @@ const ViewSelector = ({
           handleChangePrevious(
             selectedPeriod,
             setSelectedPeriod,
-            setIntervalForNewEvents,
+            setInterval,
             selectedYear,
             setSelectedYear,
           )
@@ -52,7 +52,7 @@ const ViewSelector = ({
         selectedPeriod,
         setSelectedPeriod,
         selectedYear,
-        setIntervalForNewEvents,
+        setInterval,
       )}
       <button
         className="calendar-header-arrow-btn"
@@ -60,7 +60,7 @@ const ViewSelector = ({
           handleChangeNext(
             selectedPeriod,
             setSelectedPeriod,
-            setIntervalForNewEvents,
+            setInterval,
             selectedYear,
             setSelectedYear,
           )
@@ -70,11 +70,7 @@ const ViewSelector = ({
       </button>
       <button
         onClick={() =>
-          handleToday(
-            setSelectedPeriod,
-            setIntervalForNewEvents,
-            setSelectedYear,
-          )
+          handleToday(setSelectedPeriod, setInterval, setSelectedYear)
         }
         className="calendar-header-today-btn"
       >

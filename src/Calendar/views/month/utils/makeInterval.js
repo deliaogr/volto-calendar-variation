@@ -2,11 +2,7 @@ import moment from 'moment';
 import { previousMonthDisabledDays } from './previousMonthDisabledDays';
 import { nextMonthDisabledDays } from './nextMonthDisabledDays';
 
-export const makeIntervalToFetchMonthEvents = (
-  selectedMonth,
-  selectedYear,
-  events,
-) => {
+export const makeInterval = (selectedMonth, selectedYear, events) => {
   const {
     year: yearForPreviousMonth,
     month: monthForPreviousMonth,

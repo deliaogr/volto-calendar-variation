@@ -2,14 +2,9 @@ import { MONTHS } from '../../../constants';
 import { firstAndLastDayOfTheWeek } from '../utils/firstAndLastDayOfTheWeek';
 import { makeInterval } from './makeInterval';
 
-const onChangeWeek = (
-  firstDay,
-  lastDay,
-  setSelectedWeek,
-  setIntervalForNewEvents,
-) => {
+const onChangeWeek = (firstDay, lastDay, setSelectedWeek, setInterval) => {
   setSelectedWeek(firstAndLastDayOfTheWeek(firstDay));
-  setIntervalForNewEvents(
+  setInterval(
     makeInterval(
       new Date(firstDay).getFullYear(),
       new Date(firstDay).getMonth(),
@@ -39,11 +34,7 @@ const calculateLastDay = (selectedWeek) => {
   );
 };
 
-const handlePreviousWeek = (
-  selectedWeek,
-  setSelectedWeek,
-  setIntervalForNewEvents,
-) => {
+const handlePreviousWeek = (selectedWeek, setSelectedWeek, setInterval) => {
   firstDay = calculateFirstDay(selectedWeek);
   lastDay = calculateLastDay(selectedWeek);
 
@@ -51,14 +42,10 @@ const handlePreviousWeek = (
     firstDay.setDate(calculateFirstDay(selectedWeek).getDate() - 7),
   );
   lastDay = new Date(lastDay.setDate(lastDay.getDate() - 7));
-  onChangeWeek(firstDay, lastDay, setSelectedWeek, setIntervalForNewEvents);
+  onChangeWeek(firstDay, lastDay, setSelectedWeek, setInterval);
 };
 
-const handleNextWeek = (
-  selectedWeek,
-  setSelectedWeek,
-  setIntervalForNewEvents,
-) => {
+const handleNextWeek = (selectedWeek, setSelectedWeek, setInterval) => {
   firstDay = calculateFirstDay(selectedWeek);
   lastDay = calculateLastDay(selectedWeek);
 
@@ -66,14 +53,14 @@ const handleNextWeek = (
     firstDay.setDate(calculateFirstDay(selectedWeek).getDate() + 7),
   );
   lastDay = new Date(lastDay.setDate(lastDay.getDate() + 7));
-  onChangeWeek(firstDay, lastDay, setSelectedWeek, setIntervalForNewEvents);
+  onChangeWeek(firstDay, lastDay, setSelectedWeek, setInterval);
 };
 
-const handleToday = (setSelectedWeek, setIntervalForNewEvents) => {
+const handleToday = (setSelectedWeek, setInterval) => {
   const today = firstAndLastDayOfTheWeek(new Date());
   firstDay = calculateFirstDay(today);
   lastDay = calculateLastDay(today);
-  onChangeWeek(firstDay, lastDay, setSelectedWeek, setIntervalForNewEvents);
+  onChangeWeek(firstDay, lastDay, setSelectedWeek, setInterval);
 };
 
 const displayWeeks = (selectedWeek) => {

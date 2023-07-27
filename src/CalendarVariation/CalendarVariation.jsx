@@ -10,20 +10,17 @@ import { formatEventsForInterval } from '../Utils/RRuleConnector';
 **/
 
 const CalendarVariation = ({ items, isEditMode }) => {
-  const [allEventsInInterval, setAllEventsInInterval] = useState([]);
-  const [newInterval, setNewInterval] = useState();
+  const [eventsInInterval, setEventsInInterval] = useState([]);
+  const [interval, setInterval] = useState();
 
   let defaultEvent = {};
 
+  // TODO: bug: items doesn't get updated when creating a new event
   useEffect(() => {
     let events = items.filter((item) => item['@type'] === 'Event');
-    if (!newInterval) return;
-    setAllEventsInInterval(formatEventsForInterval(events, newInterval));
-  }, [items, newInterval]);
-
-  const setIntervalForNewEvents = (interval) => {
-    setNewInterval(interval);
-  };
+    if (!interval) return;
+    setEventsInInterval(formatEventsForInterval(events, interval));
+  }, [items, interval]);
 
   const updateEvent = (eventData) => {
     // editEvent({
@@ -38,7 +35,7 @@ const CalendarVariation = ({ items, isEditMode }) => {
   };
 
   const getCurrentEventById = (eventId) => {
-    return allEventsInInterval[eventId];
+    return eventsInInterval[eventId];
   };
 
   const makeDefaultEvent = (interval) =>
@@ -53,12 +50,12 @@ const CalendarVariation = ({ items, isEditMode }) => {
         {...{
           // ModalPopUp,
           // handleOpenModal,
-          setIntervalForNewEvents,
+          setInterval,
           getCurrentEventById,
           makeDefaultEvent,
           updateEvent,
           isEditMode,
-          allEventsInInterval,
+          eventsInInterval,
         }}
       />
     </div>

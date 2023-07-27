@@ -1,5 +1,6 @@
 import React from 'react';
-import { Draggable, Droppable } from 'react-beautiful-dnd';
+import { Draggable } from 'react-beautiful-dnd';
+import Events from './events/Events';
 import { eventStyle } from '../helpers';
 import moment from 'moment';
 
@@ -17,32 +18,30 @@ const Hour = ({
   );
 
   const highestIndexWithoutHour = () => {
-    const res = eventsMatrix[date]
+    return eventsMatrix[date]
       ? parseInt(Object.keys(eventsMatrix[date]).sort().reverse()[0])
       : 0;
-    return res;
   };
 
   const highestIndexWithHour = () => {
-    const res = weekEventsMatrix[date]
+    return weekEventsMatrix[date]
       ? parseInt(Object.keys(weekEventsMatrix[date]).sort().reverse()[0])
       : 0;
-    return res;
   };
 
   const makeEventWidth = (event) => {
-    const width =
+    return (
       (new Date(event.endDate).getDate() -
         new Date(event.startDate).getDate() +
         1) *
         100 +
       5.5 *
         (new Date(event.endDate).getDate() -
-          new Date(event.startDate).getDate());
-    return width;
+          new Date(event.startDate).getDate())
+    );
   };
 
-  const hourIndicatiors = (hour) => {
+  const hourIndicators = (hour) => {
     return hour >= 0 && `${moment(hour, 'HH').format('HH')}:00`;
   };
 
@@ -152,61 +151,20 @@ const Hour = ({
         })
     )
   ) : (
-    <div className="dayWeekView">{hourIndicatiors(hour.hour)}</div>
+    <div className="dayWeekView">{hourIndicators(hour.hour)}</div>
   );
 
-  const res = hour.events ? (
+  return hour.events ? (
     hour.hour < 0 ? (
-      <Droppable droppableId={`${hourIndex}`}>
-        {(provided) => (
-          // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
-          <div
-            className="dayWeekView"
-            {...provided.droppableProps}
-            ref={provided.innerRef}
-            onClick={() => {
-              handleCreate(
-                hour.year,
-                hour.month - 1,
-                hour.dayNumber,
-                hour.hour,
-              );
-            }}
-          >
-            <div>{provided.placeholder}</div>
-            {eventsListWithoutHour}
-          </div>
-        )}
-      </Droppable>
+      <Events {...{ eventsListWithoutHour, hourIndex, hour, handleCreate }} />
     ) : (
-      <section key={hourIndex}>
-        <Droppable droppableId={`${hourIndex}`}>
-          {(provided) => (
-            // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
-            <div
-              className="dayWeekView"
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-              onClick={() => {
-                handleCreate(
-                  hour.year,
-                  hour.month - 1,
-                  hour.dayNumber,
-                  hour.hour,
-                );
-              }}
-            >
-              <div>{provided.placeholder}</div>
-              {eventsListWithHour}
-            </div>
-          )}
-        </Droppable>
-      </section>
+      // <section key={hourIndex}>
+      <Events {...{ eventsListWithHour, hourIndex, hour, handleCreate }} />
+      // </section>
     )
   ) : (
     eventsListWithHour
   );
-  return res;
 };
 
 export default Hour;
