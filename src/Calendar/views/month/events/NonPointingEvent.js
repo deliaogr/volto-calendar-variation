@@ -4,7 +4,7 @@ const NonPointingEvent = ({
   index,
   eventDayIndex,
   makeEventWidth,
-  displayEvents,
+  eventTitle,
 }) => {
   return (
     <div
@@ -14,7 +14,7 @@ const NonPointingEvent = ({
         width: `${makeEventWidth(eventDayIndex)}%`,
       }}
     >
-      {displayEvents(eventDayIndex)}
+      {eventTitle(eventDayIndex)}
     </div>
   );
 };

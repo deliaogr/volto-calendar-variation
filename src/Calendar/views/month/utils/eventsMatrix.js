@@ -11,123 +11,101 @@ const generateEventDay = (eventStartDate, index) => {
   return moment(new Date(`${month}, ${day}, ${year}`)).format('YYYY-MM-DD');
 };
 
-const isEventInDay = (daysWithEvents, eventStartDate, eventDayIndex) => {
-  // check whether day of event with index eventDayIndex has been added to daysWithEvents
-  return Object.keys(daysWithEvents).includes(
+const isEventInDay = (daysWithEventsAcc, eventStartDate, eventDayIndex) => {
+  // check whether day of event with index eventDayIndex has been added to daysWithEventsAcc
+  return Object.keys(daysWithEventsAcc).includes(
     generateEventDay(eventStartDate, eventDayIndex),
   );
 };
 
-const isPreviousEventDayInDay = (
-  daysWithEvents,
+const isPreviousEventDayAdded = (
+  daysWithEventsAcc,
   eventStartDate,
   eventDayIndex,
   currentEvent,
 ) => {
-  // check whether the previous/first day of the event has been added to daysWithEvents
-  return Object.values(
-    daysWithEvents[
+  const res = Object.values(
+    daysWithEventsAcc[
       `${generateEventDay(
         eventStartDate,
         eventDayIndex > 0 ? eventDayIndex - 1 : eventDayIndex,
       )}`
     ],
   ).includes(currentEvent);
+  console.log({ res, eventStartDate, eventDayIndex }, currentEvent.title);
+  return res;
 };
 
 // if the event is found on the previous day, then set de index to the same from the previous day
 const addEventWithPreviousIndex = (
-  daysWithEvents,
+  daysWithEventsAcc,
   eventStartDate,
   eventDayIndex,
   currentEvent,
 ) => {
+  const currentDay = `${generateEventDay(eventStartDate, eventDayIndex)}`;
+  const previousDay = generateEventDay(eventStartDate, eventDayIndex - 1);
+  const previousDayIndex = `${Object.keys(
+    daysWithEventsAcc[`${previousDay}`],
+  ).pop()}`;
+  // console.log({ currentDay });
+
   return {
-    ...daysWithEvents,
-    // day of daysWithEvents that contains the event
-    [`${generateEventDay(eventStartDate, eventDayIndex)}`]: {
-      ...daysWithEvents[`${generateEventDay(eventStartDate, eventDayIndex)}`],
-      // add the event, having he same index as the previous day
-      [`${Object.keys(
-        daysWithEvents[
-          `${generateEventDay(eventStartDate, eventDayIndex - 1)}`
-        ],
-      ).pop()}`]: currentEvent,
+    // ...daysWithEventsAcc,
+    [currentDay]: {
+      ...daysWithEventsAcc[currentDay],
+      [previousDayIndex]: currentEvent,
     },
   };
 };
 
 // if the event isn't found on the previous day, then set the index to the last index of the current day + 1
 const addEventWithNewIndex = (
-  daysWithEvents,
+  daysWithEventsAcc,
   eventStartDate,
   eventDayIndex,
   currentEvent,
   eventTimeSpan,
 ) => {
+  const currentDay = `${generateEventDay(eventStartDate, eventDayIndex)}`;
+  const nextIndex = nextFreeIndex(
+    eventTimeSpan,
+    daysWithEventsAcc,
+    eventStartDate,
+  );
+  // console.log({ currentDay });
+
   return {
-    ...daysWithEvents,
-    // day of daysWithEvents that contains the event
-    [`${generateEventDay(eventStartDate, eventDayIndex)}`]: {
-      ...daysWithEvents[`${generateEventDay(eventStartDate, eventDayIndex)}`],
-      // add the event, having the next free index
-      [nextFreeIndex(
-        eventTimeSpan,
-        daysWithEvents,
-        eventStartDate,
-      )]: currentEvent,
+    // ...daysWithEventsAcc,
+    [currentDay]: {
+      ...daysWithEventsAcc[currentDay],
+      [nextIndex]: currentEvent,
     },
   };
 };
 
-// const addDayNewEventOld = (daysWithEvents, eventStartDate, eventDayIndex, currentEvent) => {
-//   return {
-//     ...daysWithEvents,
-//     [`${generateEventDay(eventStartDate, eventDayIndex)}`]: {
-//       [`${Object.keys(
-//         daysWithEvents[`${generateEventDay(eventStartDate, eventDayIndex - 1)}`],
-//       ).pop()}`]: currentEvent,
-//     },
-//   };
-// };
-
-// const addDayNewEventNew = (
-//   daysWithEvents,
-//   eventStartDate,
-//   eventDayIndex,
-//   currentEvent,
-//   eventTimeSpan,
-// ) => {
-//   return {
-//     ...daysWithEvents,
-//     [`${generateEventDay(eventStartDate, eventDayIndex)}`]: {
-//       [nextFreeIndex(eventTimeSpan, daysWithEvents, eventStartDate)]: currentEvent,
-//     },
-//   };
-// };
-
 const isEventFromPreviousDay = (
-  daysWithEvents,
+  daysWithEventsAcc,
   eventStartDate,
   index,
   currentEvent,
 ) => {
   // check if event exists on previous day
   const previousDay =
-    daysWithEvents[`${generateEventDay(eventStartDate, index - 1)}`];
+    daysWithEventsAcc[`${generateEventDay(eventStartDate, index - 1)}`];
   if (previousDay) {
     return Object.values(previousDay).includes(currentEvent);
   }
   return false;
 };
 
-const nextFreeIndex = (eventTimeSpan, daysWithEvents, eventStartDate) => {
+const nextFreeIndex = (eventTimeSpan, daysWithEventsAcc, eventStartDate) => {
   const freeIndex = Array(Math.round(eventTimeSpan) + 1)
     .fill(0)
     .reduce((highestIndex, _, index) => {
-      // if daysWithEvents contains the day of the event
+      // if daysWithEventsAcc contains the day of the event
       if (
-        Object.keys(daysWithEvents).includes(
+        Object.keys(daysWithEventsAcc).includes(
           generateEventDay(eventStartDate, index),
         )
       ) {
@@ -135,7 +113,7 @@ const nextFreeIndex = (eventTimeSpan, daysWithEvents, eventStartDate) => {
         const highestDayIndex =
           parseInt(
             Object.keys(
-              daysWithEvents[`${generateEventDay(eventStartDate, index)}`],
+              daysWithEventsAcc[`${generateEventDay(eventStartDate, index)}`],
             ).pop(),
           ) + 1;
         return highestDayIndex > highestIndex ? highestDayIndex : highestIndex;
@@ -146,74 +124,77 @@ const nextFreeIndex = (eventTimeSpan, daysWithEvents, eventStartDate) => {
   return freeIndex;
 };
 
+/**
+ * will iterate over events, generate properties for each day with at least an event
+ * if day already exists, will add event with a new index
+ * @param {Object[]} events
+ * @returns {'YYYY-MM-DD': {0: event, 1: event, ...}}
+ */
 export default function eventsMatrix(events) {
-  return events.reduce((daysWithEvents, currentEvent) => {
+  return events.reduce((daysWithEventsAcc, currentEvent) => {
     // distance in days between start and end of event
     const eventTimeSpan =
       (new Date(currentEvent.endDate).getTime() -
         new Date(currentEvent.startDate).getTime()) /
       (1000 * 3600 * 24);
     // array with length equal to the number of days the event spans
-    const eventDays =
+    const daysOfEvent =
       eventTimeSpan > 0
         ? Array(Math.round(eventTimeSpan) + 1).fill(0)
         : Array(1).fill(0);
     let eventStartDate = new Date(currentEvent.startDate);
 
-    // daysWithEvents is an array of all days that have events, {[day: [events]]}
-    eventDays.map(
-      (_, eventDayIndex) =>
-        // if event exists in current day
-        (daysWithEvents = isEventInDay(
-          daysWithEvents,
-          eventStartDate,
-          eventDayIndex,
-        )
-          ? // if the previous/first day of the event has been added to daysWithEvents
-            isPreviousEventDayInDay(
-              daysWithEvents,
+    // daysWithEventsAcc is an array of all days that have events, {'YYYY-MM-DD': {0: event, 1: event, ...}}
+    const result = daysOfEvent.reduce((eventDayAcc, eventDayIndex) => {
+      // if event exists in current day
+      const eventDayObj = isEventInDay(
+        daysWithEventsAcc,
+        eventStartDate,
+        eventDayIndex,
+      )
+        ? // if the previous/first day of the event has been added to daysWithEventsAcc
+          isPreviousEventDayAdded(
+            daysWithEventsAcc,
+            eventStartDate,
+            eventDayIndex,
+            currentEvent,
+          )
+          ? addEventWithPreviousIndex(
+              daysWithEventsAcc,
               eventStartDate,
               eventDayIndex,
               currentEvent,
             )
-            ? // add event with index from previous day
-              addEventWithPreviousIndex(
-                daysWithEvents,
-                eventStartDate,
-                eventDayIndex,
-                currentEvent,
-              )
-            : // add event with new index
-              addEventWithNewIndex(
-                daysWithEvents,
-                eventStartDate,
-                eventDayIndex,
-                currentEvent,
-                eventTimeSpan,
-              )
-          : // if event exists on the previous day
-          isEventFromPreviousDay(
-              daysWithEvents,
-              eventStartDate,
-              eventDayIndex,
-              currentEvent,
-            )
-          ? // add event with index from the previous day
-            addEventWithPreviousIndex(
-              daysWithEvents,
-              eventStartDate,
-              eventDayIndex,
-              currentEvent,
-            )
-          : // add event with new index
-            addEventWithNewIndex(
-              daysWithEvents,
+          : addEventWithNewIndex(
+              daysWithEventsAcc,
               eventStartDate,
               eventDayIndex,
               currentEvent,
               eventTimeSpan,
-            )),
-    );
-    return daysWithEvents;
+            )
+        : // if event exists on the previous day
+        isEventFromPreviousDay(
+            daysWithEventsAcc,
+            eventStartDate,
+            eventDayIndex,
+            currentEvent,
+          )
+        ? addEventWithPreviousIndex(
+            daysWithEventsAcc,
+            eventStartDate,
+            eventDayIndex,
+            currentEvent,
+          )
+        : addEventWithNewIndex(
+            daysWithEventsAcc,
+            eventStartDate,
+            eventDayIndex,
+            currentEvent,
+            eventTimeSpan,
+          );
+      return { ...eventDayAcc, ...eventDayObj };
+    }, {});
+    // console.log({ daysWithEventsAcc, result, daysOfEvent });
+    return { ...daysWithEventsAcc, ...result };
   }, {});
 }

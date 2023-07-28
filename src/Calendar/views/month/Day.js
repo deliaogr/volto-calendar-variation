@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Droppable } from 'react-beautiful-dnd';
 import { displayDay } from './utils/displayDay';
 import EventPointingLeft from './events/EventPointingLeft';
-import NewEvent from './events/NewEvent';
+import Event from './events/Event';
 import moment from 'moment';
 import Popup from './Popup';
 
@@ -79,7 +79,8 @@ const Day = ({
           const eventDayIndex = eventsMatrix?.[date][index];
 
           return eventIndex > -1 ? (
-            <NewEvent
+            // TODO: rename
+            <Event
               {...{
                 index,
                 eventDayIndex,
@@ -117,6 +118,7 @@ const Day = ({
         >
           <div key={`key-${dayIndex}`}>
             {/* day numbers */}
+            {/* TODO: separate component */}
             <div
               key={`key-div-${dayIndex}`}
               onClick={() => {
@@ -126,6 +128,7 @@ const Day = ({
               {displayDay(day)}
               {provided.placeholder}
             </div>
+            {/* TODO: implement better */}
             {eventsList.length < 4 ? (
               eventsList
             ) : (

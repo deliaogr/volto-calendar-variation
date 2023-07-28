@@ -2,7 +2,7 @@ import { Draggable } from 'react-beautiful-dnd';
 import EventPointingRight from './EventPointingRight';
 import NonPointingEvent from './NonPointingEvent';
 
-const NewEvent = ({
+const Event = ({
   index,
   eventDayIndex,
   eventIndex,
@@ -13,7 +13,7 @@ const NewEvent = ({
   eventTimeSpan,
   eventExtendsOnMonday,
 }) => {
-  const displayEvents = (event) => {
+  const eventTitle = (event) => {
     return event
       ? eventTimeSpan(event.endDate, event.startDate) > 1
         ? event.title
@@ -47,7 +47,7 @@ const NewEvent = ({
                 index,
                 eventDayIndex,
                 makeEventWidth,
-                displayEvents,
+                eventTitle,
               }}
             />
           ) : (
@@ -56,7 +56,7 @@ const NewEvent = ({
                 index,
                 eventDayIndex,
                 makeEventWidth,
-                displayEvents,
+                eventTitle,
               }}
             />
           )}
@@ -66,4 +66,4 @@ const NewEvent = ({
   );
 };
 
-export default NewEvent;
+export default Event;

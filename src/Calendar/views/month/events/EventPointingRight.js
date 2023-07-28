@@ -4,7 +4,7 @@ const EventPointingRight = ({
   index,
   eventDayIndex,
   makeEventWidth,
-  displayEvents,
+  eventTitle,
 }) => {
   const isEventActiveRight = (event) => {
     return new Date(event?.endDate).getTime() > new Date().getTime()
@@ -28,7 +28,7 @@ const EventPointingRight = ({
           borderBottomRightRadius: '0px',
         }}
       >
-        {displayEvents(eventDayIndex)}
+        {eventTitle(eventDayIndex)}
       </div>
       <div className={isEventActiveRight(eventDayIndex)}></div>
     </div>

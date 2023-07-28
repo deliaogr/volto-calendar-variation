@@ -135,8 +135,8 @@ const Week = ({
                 weekHours,
                 handleCreate,
                 handleEdit,
-                eventsMatrix: eventsMatrix(fullDayEvents),
-                weekEventsMatrix: eventsMatrix(hourEvents),
+                fullDayEventsMatrix: eventsMatrix(fullDayEvents),
+                hourEventsMatrix: eventsMatrix(hourEvents),
                 isEditMode,
               }}
             />
