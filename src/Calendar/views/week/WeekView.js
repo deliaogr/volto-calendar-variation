@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { DAYS_OF_THE_WEEK_WEEK_VIEW } from '../../constants';
-import { firstAndLastDayOfTheWeek } from './utils/firstAndLastDayOfTheWeek';
+import { makeWeek } from './utils/makeWeek';
 import { fillCalendarDays } from './utils/fillCalendarDays';
 import Hours from './Hours';
 import { makeInterval } from './utils/makeInterval';
@@ -26,13 +26,8 @@ const Week = ({
   const hourEvents = events.filter((event) => event.startHour !== null);
 
   const [weekHours, setWeekHours] = useState(
-    fillCalendarDays(events, firstAndLastDayOfTheWeek(new Date())),
+    fillCalendarDays(events, makeWeek(new Date())),
   );
-
-  // TODO: investigate if used
-  // const [eventsMatrixState, setEventsMatrixState] = useState(
-  //   eventsMatrix(fullDayEvents),
-  // );
 
   const dayNames = DAYS_OF_THE_WEEK_WEEK_VIEW.map((dayOfTheWeek, i) => {
     return i === 0 ? (
@@ -102,15 +97,13 @@ const Week = ({
     setWeekHours(
       fillCalendarDays(
         events,
-        // TODO: rename
-        firstAndLastDayOfTheWeek(
+        makeWeek(
           new Date(
             `${selectedWeek.startYear}/${selectedWeek.startMonth}/${selectedWeek.startDay}`,
           ),
         ),
       ),
     );
-    // setEventsMatrixState(eventsMatrix(events));
   }, [events, selectedWeek]);
 
   return (

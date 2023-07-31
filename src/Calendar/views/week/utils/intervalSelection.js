@@ -1,9 +1,9 @@
 import { MONTHS } from '../../../constants';
-import { firstAndLastDayOfTheWeek } from '../utils/firstAndLastDayOfTheWeek';
+import { makeWeek } from './makeWeek';
 import { makeInterval } from './makeInterval';
 
 const onChangeWeek = (firstDay, lastDay, setSelectedWeek, setInterval) => {
-  setSelectedWeek(firstAndLastDayOfTheWeek(firstDay));
+  setSelectedWeek(makeWeek(firstDay));
   setInterval(
     makeInterval(
       new Date(firstDay).getFullYear(),
@@ -17,7 +17,7 @@ const onChangeWeek = (firstDay, lastDay, setSelectedWeek, setInterval) => {
 };
 
 const selectInitialWeek = () => {
-  return firstAndLastDayOfTheWeek(new Date());
+  return makeWeek(new Date());
 };
 
 let firstDay, lastDay;
@@ -57,7 +57,7 @@ const handleNextWeek = (selectedWeek, setSelectedWeek, setInterval) => {
 };
 
 const handleToday = (setSelectedWeek, setInterval) => {
-  const today = firstAndLastDayOfTheWeek(new Date());
+  const today = makeWeek(new Date());
   firstDay = calculateFirstDay(today);
   lastDay = calculateLastDay(today);
   onChangeWeek(firstDay, lastDay, setSelectedWeek, setInterval);

@@ -29,7 +29,6 @@ const Month = ({
   const [eventsMatrixState, setEventsMatrixState] = useState(
     eventsMatrix(events),
   );
-  console.log(eventsMatrix(events));
 
   const dayNames = DAYS_OF_THE_WEEK_MONTH_VIEW.map((dayOfTheWeek, i) => (
     <span key={`key-${i}`} className="day-name">

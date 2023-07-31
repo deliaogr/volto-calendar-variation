@@ -2,7 +2,7 @@ import { Draggable } from 'react-beautiful-dnd';
 import EventPointingRight from './EventPointingRight';
 import NonPointingEvent from './NonPointingEvent';
 
-const Event = ({
+const EventFromCurrentWeek = ({
   index,
   eventDayIndex,
   eventIndex,
@@ -66,4 +66,4 @@ const Event = ({
   );
 };
 
-export default Event;
+export default EventFromCurrentWeek;

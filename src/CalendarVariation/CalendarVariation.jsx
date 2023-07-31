@@ -2,13 +2,6 @@ import React, { useState, useEffect } from 'react';
 import Calendar from '../Calendar/Calendar';
 import { formatEventsForInterval } from '../Utils/RRuleConnector';
 
-/* 
-  TODO: refactor:
-  1. recursivator
-  2. refactor views
-  3. connector
-**/
-
 const CalendarVariation = ({ items, isEditMode }) => {
   const [eventsInInterval, setEventsInInterval] = useState([]);
   const [interval, setInterval] = useState();

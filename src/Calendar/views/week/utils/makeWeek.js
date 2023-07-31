@@ -1,4 +1,4 @@
-export const firstAndLastDayOfTheWeek = (date) => {
+export const makeWeek = (date) => {
   const currentDay = new Date(date);
   const firstDayOffset =
     currentDay.getDate() -

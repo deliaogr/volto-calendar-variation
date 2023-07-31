@@ -1,3 +1,4 @@
+// unused
 import moment from 'moment';
 
 const getEventDetails = (eventTemplate) => {
@@ -108,9 +109,9 @@ export const generateRecursiveEvents = {
           let newMonth = eventStartDate.getMonth() + recurrenceInterval;
 
           // how many years need to be added based on the number of months added to the new month
-          newYear += Math.floor((newMonth - 1) / 12);
+          newYear += Math.floor(newMonth / 12);
           // to ensure that the new month is between 1 and 12
-          newMonth = ((newMonth - 1) % 12) + 1;
+          newMonth = (newMonth % 12) + 1;
 
           const newStartDate = new Date(
             newYear,
