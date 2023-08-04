@@ -27,9 +27,9 @@ export const previousMonthDisabledDays = (monthIndex, year, events) => {
       return {
         year,
         month,
-        events: makeEventsForDay(year, month, dayNumber, events),
-        class: 'day day--disabled',
         dayNumber,
+        class: 'day day--disabled',
+        events: makeEventsForDay(year, month, dayNumber, events),
       };
     })
     .reverse();

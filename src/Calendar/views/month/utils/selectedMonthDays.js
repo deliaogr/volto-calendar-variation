@@ -1,5 +1,4 @@
 import { makeEventsForDay } from './makeEventsForDay';
-import { pastEventsConfig } from './pastEventsConfig';
 
 export const selectedMonthDays = (month, year, monthIndex, events) => {
   const monthDays = Array(month.daysInMonth)
@@ -9,16 +8,13 @@ export const selectedMonthDays = (month, year, monthIndex, events) => {
       const month = monthIndex + 1;
       const dayNumber = index + 1;
 
-      const result = {
+      return {
         year,
         month,
         dayNumber,
         class: 'day',
-        pastEventsConfig: pastEventsConfig(year, month, dayNumber, events),
         events: makeEventsForDay(year, month, dayNumber, events),
       };
-
-      return result;
     });
   return monthDays;
 };

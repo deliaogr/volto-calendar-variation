@@ -13,8 +13,8 @@ const Hours = ({
     <Hour
       {...{
         hourIndex,
-        handleCreate,
         hour,
+        handleCreate,
         handleEdit,
         fullDayEventsMatrix,
         hourEventsMatrix,

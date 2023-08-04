@@ -3,6 +3,10 @@ import { CalendarVariation } from './CalendarVariation';
 import CalendarView from './Block/View';
 import CalendarEdit from './Block/Edit';
 import CalendarBlockSchema from './Block/schema';
+import {
+  rawDataReducer,
+  updateContentReducer,
+} from './CalendarVariation/reducers';
 
 const applyConfig = (config) => {
   config.blocks.blocksConfig.calendar = {
@@ -25,9 +29,12 @@ const applyConfig = (config) => {
   config.blocks.blocksConfig.listing.variations = [
     ...config.blocks.blocksConfig.listing.variations,
     {
+      // TODO: fix case for selecting calendar variation before criteria
       id: 'calendar',
       isDefault: false,
       fullobjects: true,
+      // TODO: batch size should be adapted based on the number of events, to avoid pagination
+      b_size: 100000000,
       title: 'Calendar',
       template: CalendarVariation,
       /* use schemaEnhancer to add fields of CalendarBlock here */
@@ -43,6 +50,13 @@ const applyConfig = (config) => {
       },
     },
   ];
+
+  config.addonReducers = {
+    ...config.addonReducers,
+    rawDataReducer,
+    updateContentReducer,
+  };
+
   return config;
 };
 

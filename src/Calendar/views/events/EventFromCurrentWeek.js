@@ -1,32 +1,22 @@
 import { Draggable } from 'react-beautiful-dnd';
+import { eventExtendsOnMonday } from '../helpers';
 import EventPointingRight from './EventPointingRight';
 import NonPointingEvent from './NonPointingEvent';
 
+// this event starts in the current week, it is not extended from sunday
 const EventFromCurrentWeek = ({
   index,
-  eventDayIndex,
+  event,
+  eventTitle,
   eventIndex,
   date,
   isEditMode,
   handleEdit,
-  makeEventWidth,
-  eventTimeSpan,
-  eventExtendsOnMonday,
 }) => {
-  const eventTitle = (event) => {
-    return event
-      ? eventTimeSpan(event.endDate, event.startDate) > 1
-        ? event.title
-        : event.startHour
-        ? `${event?.startHour} ${event.title}`
-        : event.title
-      : 0;
-  };
-
   return (
     <Draggable
       key={`key-${index}`}
-      draggableId={`day-${eventDayIndex.id}-${date}`}
+      draggableId={`day-${event.id}-${date}`}
       index={eventIndex}
       isDragDisabled={isEditMode ? false : true}
     >
@@ -35,28 +25,28 @@ const EventFromCurrentWeek = ({
         <section
           key={`key-ev-${index}`}
           onClick={() => {
-            handleEdit(eventDayIndex.id, eventDayIndex?.recursive);
+            handleEdit(event.id, event?.recursive);
           }}
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
         >
-          {eventExtendsOnMonday(eventDayIndex) ? (
+          {eventExtendsOnMonday(event, date) ? (
             <EventPointingRight
               {...{
                 index,
-                eventDayIndex,
-                makeEventWidth,
+                event,
                 eventTitle,
+                date,
               }}
             />
           ) : (
             <NonPointingEvent
               {...{
                 index,
-                eventDayIndex,
-                makeEventWidth,
+                event,
                 eventTitle,
+                date,
               }}
             />
           )}

@@ -10,7 +10,6 @@ import moment from 'moment';
 import eventsMatrix from '../month/utils/eventsMatrix';
 import { withViewSelector } from '../ViewSelector/withViewSelector';
 
-// TODO: bug: daily event is missing a day
 const Week = ({
   // ModalPopUp,
   handleEdit,
@@ -24,6 +23,14 @@ const Week = ({
 }) => {
   const fullDayEvents = events.filter((event) => event.startHour === null);
   const hourEvents = events.filter((event) => event.startHour !== null);
+
+  const [fullDayEventsMatrixState, setFullDayEventsMatrixState] = useState(
+    eventsMatrix(fullDayEvents),
+  );
+
+  const [hourEventsMatrixState, setHourEventsMatrixState] = useState(
+    eventsMatrix(hourEvents),
+  );
 
   const [weekHours, setWeekHours] = useState(
     fillCalendarDays(events, makeWeek(new Date())),
@@ -94,6 +101,9 @@ const Week = ({
   }, []);
 
   useEffect(() => {
+    const fullDayEvents = events.filter((event) => event.startHour === null);
+    const hourEvents = events.filter((event) => event.startHour !== null);
+
     setWeekHours(
       fillCalendarDays(
         events,
@@ -104,6 +114,8 @@ const Week = ({
         ),
       ),
     );
+    setFullDayEventsMatrixState(eventsMatrix(fullDayEvents));
+    setHourEventsMatrixState(eventsMatrix(hourEvents));
   }, [events, selectedWeek]);
 
   return (
@@ -128,8 +140,8 @@ const Week = ({
                 weekHours,
                 handleCreate,
                 handleEdit,
-                fullDayEventsMatrix: eventsMatrix(fullDayEvents),
-                hourEventsMatrix: eventsMatrix(hourEvents),
+                fullDayEventsMatrix: fullDayEventsMatrixState,
+                hourEventsMatrix: hourEventsMatrixState,
                 isEditMode,
               }}
             />

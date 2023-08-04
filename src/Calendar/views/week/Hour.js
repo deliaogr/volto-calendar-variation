@@ -1,11 +1,11 @@
 import React from 'react';
-import EventsList from './events/EventsList';
+import EventsList from './EventsList';
 import moment from 'moment';
 
 const Hour = ({
   hourIndex,
-  handleCreate,
   hour,
+  handleCreate,
   handleEdit,
   fullDayEventsMatrix,
   hourEventsMatrix,

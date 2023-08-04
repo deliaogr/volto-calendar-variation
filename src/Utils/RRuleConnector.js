@@ -45,15 +45,32 @@ const makeDefaultEvent = (event) => {
   };
 };
 
+const isRelevant = (event, interval) => {
+  const eventStartDateTime = new Date(event.start).getTime();
+  const eventEndDateTime = new Date(event.end).getTime();
+  const intervalStartDateTime = new Date(interval.startDate).getTime();
+  const intervalEndDateTime = new Date(interval.endDate).getTime();
+
+  const eventStartsInInterval =
+    eventStartDateTime >= intervalStartDateTime &&
+    eventStartDateTime <= intervalEndDateTime;
+
+  const eventEndsInInterval =
+    eventEndDateTime >= intervalStartDateTime &&
+    eventEndDateTime <= intervalEndDateTime;
+
+  const eventIncludesInterval =
+    eventStartDateTime <= intervalStartDateTime &&
+    eventEndDateTime >= intervalEndDateTime;
+
+  const isRelevant =
+    eventStartsInInterval || eventEndsInInterval || eventIncludesInterval;
+
+  return isRelevant;
+};
+
 const formatRecursiveRelevantEvents = (event, interval) => {
   const rrule = rrulestr(event.recurrence);
-
-  const recurrenceDates = rrule.between(
-    interval.startDate.toDate(),
-    interval.endDate.toDate(),
-  );
-
-  if (recurrenceDates.length === 0) return [];
 
   const firstRecursiveEvent = {
     ...makeDefaultEvent(event),
@@ -64,10 +81,21 @@ const formatRecursiveRelevantEvents = (event, interval) => {
     new Date(firstRecursiveEvent.endDate).getTime() -
     new Date(firstRecursiveEvent.startDate).getTime();
 
+  const allRecurrenceDates = rrule.all();
+
+  const relevantRecurrenceDates = allRecurrenceDates.filter((date) =>
+    isRelevant(
+      { start: date, end: new Date(date.getTime() + eventTimeSpan) },
+      interval,
+    ),
+  );
+
+  if (relevantRecurrenceDates.length === 0) return [];
+
   // recurrenceDates is an array of all dates generated using the recurrence rule
   // but only the startDate
   // we use the original event and only update the start and end dates for each recurrent event
-  return recurrenceDates.map((date) => {
+  return relevantRecurrenceDates.map((date) => {
     const startDate = date;
     const endDate = new Date(startDate.getTime() + eventTimeSpan);
     return {
@@ -79,14 +107,7 @@ const formatRecursiveRelevantEvents = (event, interval) => {
 };
 
 const formatDefaultRelevantEvent = (event, interval) => {
-  const isRelevant = moment(event.start).isBetween(
-    interval.startDate,
-    interval.endDate,
-    undefined,
-    '[]',
-  );
-
-  return isRelevant ? [makeDefaultEvent(event)] : [];
+  return isRelevant(event, interval) ? [makeDefaultEvent(event)] : [];
 };
 
 export const formatEventsForInterval = (events = [], interval) => {

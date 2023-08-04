@@ -24,14 +24,13 @@ const isPreviousEventDayAdded = (
   eventDayIndex,
   currentEvent,
 ) => {
-  return Object.values(
-    daysWithEventsAcc[
-      `${generateEventDay(
-        eventStartDate,
-        eventDayIndex > 0 ? eventDayIndex - 1 : eventDayIndex,
-      )}`
-    ],
-  ).includes(currentEvent);
+  const previousEventDay = `${generateEventDay(
+    eventStartDate,
+    eventDayIndex > 0 ? eventDayIndex - 1 : eventDayIndex,
+  )}`;
+  return Object.values(daysWithEventsAcc[previousEventDay] || {}).includes(
+    currentEvent,
+  );
 };
 
 // if the event is found on the previous day, then set de index to the same from the previous day
@@ -48,7 +47,6 @@ const addEventWithPreviousIndex = (
   ).pop()}`;
 
   return {
-    // ...daysWithEventsAcc,
     [currentDay]: {
       ...daysWithEventsAcc[currentDay],
       [previousDayIndex]: currentEvent,
@@ -72,7 +70,6 @@ const addEventWithNewIndex = (
   );
 
   return {
-    // ...daysWithEventsAcc,
     [currentDay]: {
       ...daysWithEventsAcc[currentDay],
       [nextIndex]: currentEvent,
@@ -143,7 +140,7 @@ export default function eventsMatrix(events) {
     // daysWithEventsAcc is an array of all days that have events, {'YYYY-MM-DD': {0: event, 1: event, ...}}
     const result = daysOfEvent.reduce((eventDayAcc, _, eventDayIndex) => {
       // if event exists in current day
-      const eventDayObj = isEventInDay(
+      const eventDay = isEventInDay(
         daysWithEventsAcc,
         eventStartDate,
         eventDayIndex,
@@ -188,7 +185,7 @@ export default function eventsMatrix(events) {
             currentEvent,
             eventTimeSpan,
           );
-      return { ...eventDayAcc, ...eventDayObj };
+      return { ...eventDayAcc, ...eventDay };
     }, {});
     return { ...daysWithEventsAcc, ...result };
   }, {});

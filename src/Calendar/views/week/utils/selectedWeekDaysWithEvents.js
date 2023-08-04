@@ -38,20 +38,18 @@ export const selectedWeekDaysWithEvents = (selectedWeek, events) => {
 
       const hour = Math.trunc(index / 8) - 1;
 
-      const result =
-        index % 8 === 0
-          ? hour >= 0
-            ? { hour }
-            : {}
-          : {
-              year,
-              month,
-              dayNumber,
-              class: 'day',
-              hour,
-              events: makeEventsForHour(year, month, dayNumber, hour, events),
-            };
-      return result;
+      return index % 8 === 0
+        ? hour >= 0
+          ? { hour }
+          : {}
+        : {
+            year,
+            month,
+            dayNumber,
+            hour,
+            class: 'day weekDay',
+            events: makeEventsForHour(year, month, dayNumber, hour, events),
+          };
     });
   return selectedWeekDays;
 };

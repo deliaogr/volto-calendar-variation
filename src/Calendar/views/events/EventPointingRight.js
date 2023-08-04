@@ -1,11 +1,6 @@
-import { eventStyle } from '../../helpers';
+import { eventStyle, makeEventWidth } from '../helpers';
 
-const EventPointingRight = ({
-  index,
-  eventDayIndex,
-  makeEventWidth,
-  eventTitle,
-}) => {
+const EventPointingRight = ({ index, event, eventTitle, date }) => {
   const isEventActiveRight = (event) => {
     return new Date(event?.endDate).getTime() > new Date().getTime()
       ? 'triangle-right-active'
@@ -17,20 +12,20 @@ const EventPointingRight = ({
       key={`key-div-${index}`}
       className="line-up"
       style={{
-        width: `${makeEventWidth(eventDayIndex)}%`,
+        width: `${makeEventWidth(event, date)}%`,
       }}
     >
       <div
-        className={eventStyle(eventDayIndex)}
+        className={eventStyle(event)}
         style={{
-          width: `${makeEventWidth(eventDayIndex)}%`,
+          width: `${makeEventWidth(event, date)}%`,
           borderTopRightRadius: '0px',
           borderBottomRightRadius: '0px',
         }}
       >
-        {eventTitle(eventDayIndex)}
+        {eventTitle(event)}
       </div>
-      <div className={isEventActiveRight(eventDayIndex)}></div>
+      <div className={isEventActiveRight(event)}></div>
     </div>
   );
 };

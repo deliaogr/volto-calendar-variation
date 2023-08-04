@@ -16,7 +16,7 @@ const ViewSelector = ({
 }) => {
   const viewSelect = (
     <div className="dropdown">
-      <button className="dropwdown-view-btn">{selectedView}</button>
+      <button className="dropdown-view-btn">{selectedView}</button>
       <div className="dropdown-view-content">
         {viewNames.map((view, index) => (
           // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
