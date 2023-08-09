@@ -7,7 +7,6 @@ const EventsList = ({
   eventsMatrix,
   dayIndex,
   day,
-  handleCreate,
   isEditMode,
   handleEdit,
 }) => {

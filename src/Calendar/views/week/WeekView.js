@@ -11,12 +11,9 @@ import eventsMatrix from '../month/utils/eventsMatrix';
 import { withViewSelector } from '../ViewSelector/withViewSelector';
 
 const Week = ({
-  // ModalPopUp,
   handleEdit,
   setInterval,
   updateEvent,
-  // handleOpenModal,
-  makeDefaultEvent,
   isEditMode,
   events = [],
   selectedPeriod: selectedWeek,
@@ -78,14 +75,6 @@ const Week = ({
     return updateEvent({ ...event, startDate, endDate, startHour, endHour });
   };
 
-  const handleCreate = (year, month, day, startHour) => {
-    // makeDefaultEvent({
-    //   ...makeInterval(year, month, day, year, month, day),
-    //   startHour: moment(startHour, 'HH:mm'),
-    // });
-    // handleOpenModal();
-  };
-
   useEffect(() => {
     setInterval(
       makeInterval(
@@ -138,7 +127,6 @@ const Week = ({
             <Hours
               {...{
                 weekHours,
-                handleCreate,
                 handleEdit,
                 fullDayEventsMatrix: fullDayEventsMatrixState,
                 hourEventsMatrix: hourEventsMatrixState,
@@ -147,7 +135,6 @@ const Week = ({
             />
           </div>
         </div>
-        {/* <ModalPopUp /> */}
       </DragDropContext>
     </div>
   );

@@ -3,14 +3,7 @@ import { Droppable } from 'react-beautiful-dnd';
 import { displayDayNumbers } from './utils/displayDayNumbers';
 import EventsList from './EventsList';
 
-const Day = ({
-  dayIndex,
-  day,
-  handleCreate,
-  handleEdit,
-  eventsMatrix = {},
-  isEditMode,
-}) => {
+const Day = ({ dayIndex, day, handleEdit, eventsMatrix = {}, isEditMode }) => {
   return (
     <Droppable droppableId={`${dayIndex}`} key={`key-drop-${dayIndex}`}>
       {(provided) => (
@@ -27,7 +20,6 @@ const Day = ({
                 eventsMatrix,
                 dayIndex,
                 day,
-                handleCreate,
                 isEditMode,
                 handleEdit,
               }}

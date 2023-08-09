@@ -9,11 +9,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getRawContent, updateContent } from './actions';
 
 const CalendarVariation = ({ items, isEditMode, intl }) => {
+  const dispatch = useDispatch();
   const [eventsInInterval, setEventsInInterval] = useState([]);
   const [interval, setInterval] = useState();
-  const [modalOpen, setIsModalOpen] = useState(false);
-
-  let defaultEvent = {};
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formData, setFormData] = useState();
 
   useEffect(() => {
     let events = items.filter((item) => item['@type'] === 'Event');
@@ -21,75 +21,101 @@ const CalendarVariation = ({ items, isEditMode, intl }) => {
     setEventsInInterval(formatEventsForInterval(events, interval));
   }, [items, interval]);
 
-  const updateEvent = (eventData) => {
-    // editEvent({
-    //   title: eventData.title,
-    //   startDate: eventData.startDate,
-    //   endDate: eventData.endDate,
-    //   id: eventData.id,
-    //   startHour: eventData.startHour ? eventData.startHour : null,
-    //   endHour: eventData.endHour ? eventData.endHour : null,
-    //   recursive: eventData.recursive,
-    // });
-  };
-
   const getCurrentEventById = (eventId) => {
-    return eventsInInterval[eventId];
+    const event = items.find((item) => item.id === eventId);
+    if (event) {
+      setFormData({
+        title: event.title,
+        eventStarts: event.start,
+        eventEnds: event.end,
+        id: event.id,
+        wholeDay: event.whole_day,
+        // recursive: event.recurrence || 'no',
+      });
+    }
+
+    return event;
   };
 
-  const makeDefaultEvent = (interval) =>
-    (defaultEvent = {
-      ...interval,
-      recursive: 'no',
-    });
+  const updateEvent = (eventData) => {
+    const event = getCurrentEventById(eventData.id);
+    if (!event) return;
+    const path = flattenToAppURL(event['@id']);
+
+    let eventStartDate = new Date(eventData.startDate).toISOString();
+    let eventEndDate = new Date(eventData.endDate).toISOString();
+
+    if (eventData.startHour) {
+      const [startYear, startMonth, startDay] = eventData.startDate.split('-');
+      const [startHour, startMinute] = eventData.startHour.split(':');
+      const [endYear, endMonth, endDay] = eventData.endDate.split('-');
+      const [endHour, endMinute] = eventData.endHour.split(':');
+
+      const combinedStartDate = new Date(
+        startYear,
+        startMonth - 1,
+        startDay,
+        startHour,
+        startMinute,
+      ).toISOString();
+      const combinedEndDate = new Date(
+        endYear,
+        endMonth - 1,
+        endDay,
+        endHour,
+        endMinute,
+      ).toISOString();
+
+      eventStartDate = combinedStartDate;
+      eventEndDate = combinedEndDate;
+    }
+
+    const dataToSend = {
+      title: eventData.title,
+      start: eventStartDate,
+      end: eventEndDate,
+      id: eventData.id,
+    };
+    console.log({ event, eventData, dataToSend });
+    dispatch(updateContent(path, {}, dataToSend));
+  };
 
   const onSubmit = (e) => {
+    const event = getCurrentEventById(e.id);
+    if (!event) return;
+
+    const path = flattenToAppURL(event['@id']);
+
     const dataToSend = {
       title: e.title,
       start: e.eventStarts,
       end: e.eventEnds,
-      recurrence: e.recursive,
+      id: e.id,
       whole_day: e.wholeDay,
     };
+
     dispatch(updateContent(path, {}, dataToSend));
     setIsModalOpen(false);
     dispatch(getRawContent(path));
-    // setCurrentItem(null);
   };
 
   const handleOnCancel = () => {
     setIsModalOpen(false);
   };
 
-  const path = flattenToAppURL(items[0]?.['@id'] ? `${items[0]['@id']}` : null);
-
-  const dispatch = useDispatch();
-  const request = useSelector((state) => state.rawDataReducer?.[path]);
-  const content = request?.data;
-
-  const formData = content && {
-    title: content.title,
-    eventStarts: content.start,
-    eventEnds: content.end,
-    id: content.id,
-    recursive: content.recurrence || 'no',
-    wholeDay: content.whole_day,
+  const handleEdit = (eventId) => {
+    getCurrentEventById(eventId);
+    setIsModalOpen(true);
   };
-
-  useEffect(() => {
-    if (path && !request?.loading && !request?.loaded && !content)
-      dispatch(getRawContent(path));
-  }, [dispatch, path, content, request]);
 
   return (
     <div>
-      <button onClick={() => setIsModalOpen(true)}>Open Modal</button>
-      {modalOpen && isEditMode && (
+      {isModalOpen && formData && isEditMode && (
         <ModalForm
           schema={EditEventSchema(intl)}
           onSubmit={onSubmit}
           title={'Edit event'}
-          open={modalOpen}
+          open={isModalOpen}
           formData={formData}
           onCancel={handleOnCancel}
           key="JSON"
@@ -97,11 +123,9 @@ const CalendarVariation = ({ items, isEditMode, intl }) => {
       )}
       <Calendar
         {...{
-          // ModalPopUp,
-          // handleOpenModal,
+          handleEdit,
           setInterval,
           getCurrentEventById,
-          makeDefaultEvent,
           updateEvent,
           isEditMode,
           eventsInInterval,

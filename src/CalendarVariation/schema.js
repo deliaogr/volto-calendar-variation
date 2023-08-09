@@ -11,8 +11,8 @@ const EditEventSchema = (intl) => {
           'title',
           'eventStarts',
           'eventEnds',
-          'id',
-          'recursive',
+          // 'id',
+          // 'recursive',
           'wholeDay',
         ],
       },
@@ -29,12 +29,12 @@ const EditEventSchema = (intl) => {
         title: intl.formatMessage(messages.eventEnds),
         widget: 'datetime',
       },
-      id: {
-        title: intl.formatMessage(messages.id),
-      },
-      recursive: {
-        title: intl.formatMessage(messages.recursive),
-      },
+      // id: {
+      //   title: intl.formatMessage(messages.id),
+      // },
+      // recursive: {
+      //   title: intl.formatMessage(messages.recursive),
+      // },
       wholeDay: {
         title: intl.formatMessage(messages.wholeDay),
         type: 'boolean',
@@ -56,14 +56,14 @@ const messages = defineMessages({
     id: 'Event Ends',
     defaultMessage: 'Event Ends',
   },
-  id: {
-    id: 'Event ID',
-    defaultMessage: 'Event ID',
-  },
-  recursive: {
-    id: 'Recursive',
-    defaultMessage: 'Recursive',
-  },
+  // id: {
+  //   id: 'Event ID',
+  //   defaultMessage: 'Event ID',
+  // },
+  // recursive: {
+  //   id: 'Recursive',
+  //   defaultMessage: 'Recursive',
+  // },
   wholeDay: {
     id: 'Whole Day',
     defaultMessage: 'Whole Day',

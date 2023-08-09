@@ -1,6 +1,7 @@
 export const GET_RAW_CONTENT = 'GET_RAW_CONTENT';
 export const UPDATE_CONTENT = 'UPDATE_CONTENT';
 
+// TODO: remove or repurpose
 export function rawDataReducer(state = {}, action = {}) {
   let { result, url } = action;
 

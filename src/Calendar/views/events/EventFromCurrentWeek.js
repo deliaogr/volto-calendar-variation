@@ -25,7 +25,7 @@ const EventFromCurrentWeek = ({
         <section
           key={`key-ev-${index}`}
           onClick={() => {
-            handleEdit(event.id, event?.recursive);
+            handleEdit(event.id);
           }}
           ref={provided.innerRef}
           {...provided.draggableProps}

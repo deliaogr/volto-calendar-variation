@@ -6,17 +6,13 @@ import { makeInterval } from './utils/makeInterval';
 import { fillCalendarDays } from './utils/fillCalendarDays';
 import moment from 'moment';
 import { onDragEnd } from '../helpers';
-// import { makeInterval } from '../week/utils/makeInterval';
 import eventsMatrix from './utils/eventsMatrix';
 import { withViewSelector } from '../ViewSelector/withViewSelector';
 
 const Month = ({
-  // ModalPopUp,
   handleEdit,
   setInterval,
   updateEvent,
-  // handleOpenModal,
-  makeDefaultEvent,
   isEditMode,
   events = [],
   selectedPeriod: selectedMonth,
@@ -57,11 +53,6 @@ const Month = ({
     });
   };
 
-  const handleCreate = (year, month, day) => {
-    // makeDefaultEvent(makeInterval(year, month, day, year, month, day));
-    // handleOpenModal();
-  };
-
   useEffect(() => {
     setInterval(makeInterval(selectedMonth, selectedYear, []));
   }, []);
@@ -84,14 +75,12 @@ const Month = ({
           <Days
             {...{
               days,
-              handleCreate,
               handleEdit,
               eventsMatrix: eventsMatrixState,
               isEditMode,
             }}
           />
         </div>
-        {/* <ModalPopUp /> */}
       </DragDropContext>
     </div>
   );

@@ -2,12 +2,7 @@ import { displayDay } from './displayDay';
 
 export const displayDayNumbers = (day, dayIndex, provided) => {
   return (
-    <div
-      key={`key-div-${dayIndex}`}
-      onClick={() => {
-        handleCreate(day.year, day.month - 1, day.dayNumber);
-      }}
-    >
+    <div key={`key-div-${dayIndex}`}>
       {displayDay(day)}
       {provided.placeholder}
     </div>

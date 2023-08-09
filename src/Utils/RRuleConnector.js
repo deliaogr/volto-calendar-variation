@@ -39,8 +39,7 @@ const makeDefaultEvent = (event) => {
     endDate: moment(endDateTime).format('YYYY-MM-DD'),
     startHour: isFullDayEvent ? null : `${startHour}:${startMinutes}`,
     endHour: isFullDayEvent ? null : `${endHour}:${endMinutes}`,
-    url: flattenToAppURL(event['@id']),
-    id: Math.floor(Math.random() * 100),
+    id: event.id,
     recursive: 'no',
   };
 };
@@ -48,8 +47,10 @@ const makeDefaultEvent = (event) => {
 const isRelevant = (event, interval) => {
   const eventStartDateTime = new Date(event.start).getTime();
   const eventEndDateTime = new Date(event.end).getTime();
-  const intervalStartDateTime = new Date(interval.startDate).getTime();
-  const intervalEndDateTime = new Date(interval.endDate).getTime();
+  const intervalStartDate = new Date(interval.startDate).setHours(0, 0, 0, 0);
+  const intervalStartDateTime = new Date(intervalStartDate).getTime();
+  const intervalEndDate = new Date(interval.endDate).setHours(23, 59, 59, 999);
+  const intervalEndDateTime = new Date(intervalEndDate).getTime();
 
   const eventStartsInInterval =
     eventStartDateTime >= intervalStartDateTime &&

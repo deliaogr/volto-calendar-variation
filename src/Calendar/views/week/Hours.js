@@ -3,7 +3,6 @@ import Hour from './Hour';
 
 const Hours = ({
   weekHours,
-  handleCreate,
   handleEdit,
   fullDayEventsMatrix,
   hourEventsMatrix,
@@ -14,7 +13,6 @@ const Hours = ({
       {...{
         hourIndex,
         hour,
-        handleCreate,
         handleEdit,
         fullDayEventsMatrix,
         hourEventsMatrix,

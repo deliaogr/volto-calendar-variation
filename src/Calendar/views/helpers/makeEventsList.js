@@ -4,11 +4,12 @@ import EventFromLastWeek from '../events/EventFromLastWeek';
 import EventFromCurrentWeek from '../events/EventFromCurrentWeek';
 
 const isCorrectHour = (cellData, event) => {
-  const eventStartHour = event.startHour ?? false;
+  const eventStartHour = event?.startHour ?? false;
   const isWeekView = !isNaN(cellData.hour);
 
-  const result = isWeekView ? cellData.hour === parseInt(eventStartHour) : true;
-  return result;
+  return isWeekView && eventStartHour
+    ? cellData.hour === parseInt(eventStartHour)
+    : true;
 };
 
 export const makeEventsList = (
@@ -53,11 +54,7 @@ export const makeEventsList = (
             />
           ) : (
             // TODO: find out why empty cell doesn't work for week view
-            // when an index has no event in week view, we leave no empty space
-            // cellData.class.includes('weekDay') ? null : (
-            // whereas in month view, we show an empty cellData to avoid overlapping events
             <section key={`key-${index}`} className="empty-cell"></section>
           );
-          // );
         });
 };

@@ -5,7 +5,6 @@ import moment from 'moment';
 const Hour = ({
   hourIndex,
   hour,
-  handleCreate,
   handleEdit,
   fullDayEventsMatrix,
   hourEventsMatrix,
@@ -23,7 +22,6 @@ const Hour = ({
           eventsMatrix: fullDayEventsMatrix,
           hourIndex,
           hour,
-          handleCreate,
           isEditMode,
           handleEdit,
         }}
@@ -35,7 +33,6 @@ const Hour = ({
           eventsMatrix: hourEventsMatrix,
           hourIndex,
           hour,
-          handleCreate,
           isEditMode,
           handleEdit,
         }}

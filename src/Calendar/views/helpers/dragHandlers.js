@@ -32,7 +32,7 @@ const addDroppedEvent = (destinationDay, eventToMove, destination) => {
  */
 export const onDragEnd = (
   dragResult,
-  timeIncrements,
+  cells,
   setPeriod,
   updateEvent,
   updateEventDates,
@@ -43,7 +43,7 @@ export const onDragEnd = (
     return;
   }
   // make copy to make it safe to mutate, the source won't be changed
-  const days = timeIncrements.slice();
+  const days = cells.slice();
   const sourceDay = days[source.droppableId];
   const destinationDay = days[destination.droppableId];
   const event = sourceDay.events[source.index];

@@ -6,7 +6,6 @@ const EventsList = ({
   eventsMatrix,
   hourIndex,
   hour,
-  handleCreate,
   isEditMode,
   handleEdit,
 }) => {
@@ -15,11 +14,11 @@ const EventsList = ({
   );
 
   const eventTitle = (event) => {
-    return !event.startHour && !event.endHour
-      ? event.title
-      : event.endHour
-      ? `${event.startHour}-${event?.endHour} ${event.title}`
-      : `${event.startHour} ${event.title}`;
+    return !event?.startHour && !event?.endHour
+      ? event?.title
+      : event?.endHour
+      ? `${event?.startHour}-${event?.endHour} ${event?.title}`
+      : `${event?.startHour} ${event?.title}`;
   };
 
   const eventsList = makeEventsList(
@@ -40,9 +39,6 @@ const EventsList = ({
             className="dayWeekView"
             {...provided.droppableProps}
             ref={provided.innerRef}
-            onClick={() =>
-              handleCreate(hour.year, hour.month - 1, hour.dayNumber, hour.hour)
-            }
           >
             <div>{provided.placeholder}</div>
             {eventsList}

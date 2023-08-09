@@ -6,10 +6,8 @@ import { INITIAL_VIEW } from './constants';
 const viewNames = Object.keys(views);
 
 const Calendar = ({
-  // ModalPopUp,
-  // handleOpenModal,
+  handleEdit,
   setInterval,
-  getCurrentEventById,
   makeDefaultEvent,
   updateEvent,
   isEditMode,
@@ -19,11 +17,6 @@ const Calendar = ({
 
   const View = views[selectedView];
 
-  const handleEdit = (eventId) => {
-    getCurrentEventById(eventId);
-    // handleOpenModal();
-  };
-
   return (
     <div>
       <div className="calendar-container">
@@ -32,12 +25,10 @@ const Calendar = ({
             selectedView,
             setSelectedView,
             viewNames,
-            // ModalPopUp,
             handleEdit,
             events,
             setInterval,
             updateEvent,
-            // handleOpenModal,
             makeDefaultEvent,
             isEditMode,
           }}
