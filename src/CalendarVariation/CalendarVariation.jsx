@@ -5,10 +5,17 @@ import EditEventSchema from './schema';
 import { ModalForm } from '@plone/volto/components';
 import { injectIntl } from 'react-intl';
 import { flattenToAppURL } from '@plone/volto/helpers';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { getRawContent, updateContent } from './actions';
 
-const CalendarVariation = ({ items, isEditMode, intl }) => {
+const CalendarVariation = ({
+  items,
+  isEditMode,
+  intl,
+  initial_view,
+  user_select_view,
+  initial_date,
+}) => {
   const dispatch = useDispatch();
   const [eventsInInterval, setEventsInInterval] = useState([]);
   const [interval, setInterval] = useState();
@@ -30,7 +37,6 @@ const CalendarVariation = ({ items, isEditMode, intl }) => {
         eventEnds: event.end,
         id: event.id,
         wholeDay: event.whole_day,
-        // recursive: event.recurrence || 'no',
       });
     }
 
@@ -76,7 +82,7 @@ const CalendarVariation = ({ items, isEditMode, intl }) => {
       end: eventEndDate,
       id: eventData.id,
     };
-    console.log({ event, eventData, dataToSend });
+
     dispatch(updateContent(path, {}, dataToSend));
   };
 
@@ -129,6 +135,9 @@ const CalendarVariation = ({ items, isEditMode, intl }) => {
           updateEvent,
           isEditMode,
           eventsInInterval,
+          initial_view,
+          user_select_view,
+          initial_date,
         }}
       />
     </div>

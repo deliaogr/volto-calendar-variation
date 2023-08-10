@@ -6,8 +6,10 @@ const onChangeMonth = (monthSelection, year, setCurrentMonth, setInterval) => {
   setInterval(makeInterval(monthSelection, year, []));
 };
 
-const selectInitialMonth = () => {
-  return MONTHS[new Date().getMonth()];
+const selectInitialMonth = (initial_date) => {
+  return initial_date
+    ? MONTHS[new Date(initial_date).getMonth()]
+    : MONTHS[new Date().getMonth()];
 };
 
 const setNextYear = (

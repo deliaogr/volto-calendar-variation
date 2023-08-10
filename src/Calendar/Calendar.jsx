@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import './coursesCalendar.css';
 import * as views from './views';
-import { INITIAL_VIEW } from './constants';
 
 const viewNames = Object.keys(views);
 
@@ -12,8 +11,11 @@ const Calendar = ({
   updateEvent,
   isEditMode,
   eventsInInterval: events,
+  initial_view,
+  user_select_view,
+  initial_date,
 }) => {
-  const [selectedView, setSelectedView] = useState(INITIAL_VIEW);
+  const [selectedView, setSelectedView] = useState(initial_view);
 
   const View = views[selectedView];
 
@@ -31,6 +33,8 @@ const Calendar = ({
             updateEvent,
             makeDefaultEvent,
             isEditMode,
+            user_select_view,
+            initial_date,
           }}
         />
       </div>

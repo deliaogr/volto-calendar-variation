@@ -16,8 +16,8 @@ const onChangeWeek = (firstDay, lastDay, setSelectedWeek, setInterval) => {
   );
 };
 
-const selectInitialWeek = () => {
-  return makeWeek(new Date());
+const selectInitialWeek = (initial_date) => {
+  return initial_date ? makeWeek(new Date(initial_date)) : makeWeek(new Date());
 };
 
 let firstDay, lastDay;

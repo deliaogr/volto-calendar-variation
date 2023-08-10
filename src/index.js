@@ -33,11 +33,10 @@ const applyConfig = (config) => {
       id: 'calendar',
       isDefault: false,
       fullobjects: true,
-      // TODO: batch size should be adapted based on the number of events, to avoid pagination
+      // batch size should be adapted based on the number of events, to avoid pagination
       b_size: 100000000,
       title: 'Calendar',
       template: CalendarVariation,
-      /* use schemaEnhancer to add fields of CalendarBlock here */
       schemaEnhancer: ({ schema, formData, intl }) => {
         const blockSchema = CalendarBlockSchema(intl);
         Object.keys(blockSchema.properties).forEach((key) => {

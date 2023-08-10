@@ -2,9 +2,8 @@ import messages from './messages';
 
 const getViewChoices = (intl) => {
   return [
-    ['monthTable', intl.formatMessage(messages.labelMonthTable)],
-    ['weekTable', intl.formatMessage(messages.labelWeekTable)],
-    // ['dayTable', intl.formatMessage(messages.labelDayTable)],
+    ['Month', intl.formatMessage(messages.labelMonthTable)],
+    ['Week', intl.formatMessage(messages.labelWeekTable)],
   ];
 };
 

@@ -13,6 +13,7 @@ const ViewSelector = ({
   setSelectedPeriod,
   displayPeriod,
   setInterval,
+  user_select_view,
 }) => {
   const viewSelect = (
     <div className="dropdown">
@@ -76,7 +77,7 @@ const ViewSelector = ({
       >
         Today
       </button>
-      {viewSelect}
+      {user_select_view && viewSelect}
     </div>
   );
 };

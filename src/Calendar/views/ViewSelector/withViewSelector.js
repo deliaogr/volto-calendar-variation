@@ -6,7 +6,14 @@ export const withViewSelector = (WrappedComponent) => {
   return (props) => {
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
-    const { selectedView, setSelectedView, viewNames, setInterval } = props;
+    const {
+      selectedView,
+      setSelectedView,
+      viewNames,
+      setInterval,
+      user_select_view,
+      initial_date,
+    } = props;
 
     const {
       handleChangeNext,
@@ -16,7 +23,9 @@ export const withViewSelector = (WrappedComponent) => {
       displayPeriod,
     } = intervalSelectors[selectedView];
 
-    const [selectedPeriod, setSelectedPeriod] = useState(selectInitialPeriod());
+    const [selectedPeriod, setSelectedPeriod] = useState(
+      selectInitialPeriod(initial_date),
+    );
 
     return (
       <>
@@ -35,6 +44,7 @@ export const withViewSelector = (WrappedComponent) => {
             selectInitialPeriod,
             displayPeriod,
             setInterval,
+            user_select_view,
           }}
         />
         <WrappedComponent {...{ selectedYear, selectedPeriod, ...props }} />
