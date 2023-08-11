@@ -51,7 +51,7 @@ const CalendarVariation = ({
     let eventStartDate = new Date(eventData.startDate).toISOString();
     let eventEndDate = new Date(eventData.endDate).toISOString();
 
-    if (eventData.startHour) {
+    if (eventData.startHour && eventData.endHour) {
       const [startYear, startMonth, startDay] = eventData.startDate.split('-');
       const [startHour, startMinute] = eventData.startHour.split(':');
       const [endYear, endMonth, endDay] = eventData.endDate.split('-');

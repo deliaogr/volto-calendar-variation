@@ -1,6 +1,5 @@
 import moment from 'moment';
-import { flattenToAppURL } from '@plone/volto/helpers';
-import { rrulestr } from 'rrule';
+import { rrulestr, RRule, RRuleSet } from 'rrule';
 
 /**
  *
@@ -71,7 +70,24 @@ const isRelevant = (event, interval) => {
 };
 
 const formatRecursiveRelevantEvents = (event, interval) => {
-  const rrule = rrulestr(event.recurrence);
+  const rruleSet = rrulestr(event.recurrence);
+  const eventStartDate = new Date(event.start);
+
+  const clonedRuleSet = new RRuleSet();
+  rruleSet.rrules().forEach((rrule) => {
+    const clonedRule = new RRule({
+      ...rrule.options,
+      dtstart: eventStartDate,
+      byhour: rrule.options.byhour.length ? eventStartDate.getHours() : [],
+      // rrule expects monday to be 0, while Date sets sunday as 0
+      byweekday: rrule.options.byweekday ? eventStartDate.getDay() - 1 : null,
+      bymonthday: rrule.options.bymonthday.length
+        ? eventStartDate.getDate()
+        : [],
+      bymonth: rrule.options.bymonth ? eventStartDate.getDate() : null,
+    });
+    clonedRuleSet.rrule(clonedRule);
+  });
 
   const firstRecursiveEvent = {
     ...makeDefaultEvent(event),
@@ -82,7 +98,8 @@ const formatRecursiveRelevantEvents = (event, interval) => {
     new Date(firstRecursiveEvent.endDate).getTime() -
     new Date(firstRecursiveEvent.startDate).getTime();
 
-  const allRecurrenceDates = rrule.all();
+  const allRecurrenceDates = clonedRuleSet.all();
+  console.log({ allRecurrenceDates, firstRecursiveEvent });
 
   const relevantRecurrenceDates = allRecurrenceDates.filter((date) =>
     isRelevant(
