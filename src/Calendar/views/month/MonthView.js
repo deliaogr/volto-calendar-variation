@@ -17,6 +17,7 @@ const Month = ({
   events = [],
   selectedPeriod: selectedMonth,
   selectedYear,
+  setIsRecEventModalOpen,
 }) => {
   const [days, setDays] = useState(
     fillCalendarDays(selectedMonth.key, events, selectedYear),
@@ -66,7 +67,14 @@ const Month = ({
     <div>
       <DragDropContext
         onDragEnd={(dragResult) =>
-          onDragEnd(dragResult, days, setDays, updateEvent, updateEventDates)
+          onDragEnd(
+            dragResult,
+            days,
+            setDays,
+            updateEvent,
+            updateEventDates,
+            setIsRecEventModalOpen,
+          )
         }
         enableDefaultSensors={isEditMode ? true : false}
       >

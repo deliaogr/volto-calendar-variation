@@ -14,6 +14,7 @@ const Calendar = ({
   initial_view,
   user_select_view,
   initial_date,
+  setIsRecEventModalOpen,
 }) => {
   const [selectedView, setSelectedView] = useState(initial_view);
 
@@ -35,6 +36,7 @@ const Calendar = ({
             isEditMode,
             user_select_view,
             initial_date,
+            setIsRecEventModalOpen,
           }}
         />
       </div>

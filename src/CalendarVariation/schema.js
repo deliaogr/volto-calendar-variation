@@ -7,43 +7,30 @@ const EditEventSchema = (intl) => {
       {
         id: 'default',
         title: 'default',
-        fields: [
-          'title',
-          'eventStarts',
-          'eventEnds',
-          // 'id',
-          // 'recursive',
-          'wholeDay',
-        ],
+        fields: ['title', 'eventStarts', 'eventEnds', 'wholeDay'],
       },
     ],
     properties: {
       title: {
-        title: intl.formatMessage(messages.title),
+        title: intl.formatMessage(editEventMessages.title),
       },
       eventStarts: {
-        title: intl.formatMessage(messages.eventStarts),
+        title: intl.formatMessage(editEventMessages.eventStarts),
         widget: 'datetime',
       },
       eventEnds: {
-        title: intl.formatMessage(messages.eventEnds),
+        title: intl.formatMessage(editEventMessages.eventEnds),
         widget: 'datetime',
       },
-      // id: {
-      //   title: intl.formatMessage(messages.id),
-      // },
-      // recursive: {
-      //   title: intl.formatMessage(messages.recursive),
-      // },
       wholeDay: {
-        title: intl.formatMessage(messages.wholeDay),
+        title: intl.formatMessage(editEventMessages.wholeDay),
         type: 'boolean',
       },
     },
   };
 };
 
-const messages = defineMessages({
+const editEventMessages = defineMessages({
   title: {
     id: 'Event Title',
     defaultMessage: 'Title',
@@ -56,18 +43,60 @@ const messages = defineMessages({
     id: 'Event Ends',
     defaultMessage: 'Event Ends',
   },
-  // id: {
-  //   id: 'Event ID',
-  //   defaultMessage: 'Event ID',
-  // },
-  // recursive: {
-  //   id: 'Recursive',
-  //   defaultMessage: 'Recursive',
-  // },
   wholeDay: {
     id: 'Whole Day',
     defaultMessage: 'Whole Day',
   },
 });
 
-export default EditEventSchema;
+const getMoveEventChoices = (intl) => {
+  return [
+    ['Only this event', intl.formatMessage(moveEventMessages.labelSingleEvent)],
+    [
+      'This and next events in series',
+      intl.formatMessage(moveEventMessages.labelNextEvents),
+    ],
+  ];
+};
+
+const MoveRecEventSchema = (intl) => {
+  const moveChoices = getMoveEventChoices(intl);
+
+  return {
+    required: ['moveEvent'],
+    fieldsets: [
+      {
+        id: 'default',
+        title: 'default',
+        fields: ['moveEvent'],
+      },
+    ],
+    properties: {
+      moveEvent: {
+        title: intl.formatMessage(moveEventMessages.labelMoveEvent),
+        type: 'string',
+        factory: 'Choice',
+        choices: moveChoices,
+        isMulti: false,
+        default: 'Only this event',
+      },
+    },
+  };
+};
+
+const moveEventMessages = defineMessages({
+  labelMoveEvent: {
+    id: 'Move event',
+    defaultMessage: 'Move event',
+  },
+  labelSingleEvent: {
+    id: 'Only this event',
+    defaultMessage: 'Only this event',
+  },
+  labelNextEvents: {
+    id: 'This and next events in series',
+    defaultMessage: 'This and next events in series',
+  },
+});
+
+export { EditEventSchema, MoveRecEventSchema };

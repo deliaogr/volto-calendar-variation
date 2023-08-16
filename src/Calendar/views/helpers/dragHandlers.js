@@ -36,6 +36,7 @@ export const onDragEnd = (
   setPeriod,
   updateEvent,
   updateEventDates,
+  setIsRecEventModalOpen,
 ) => {
   const { source, destination } = dragResult;
   // if destination is not droppable or source is the same as destination, it will be kept in place
@@ -59,4 +60,7 @@ export const onDragEnd = (
   };
   updateEventDates(event, destinationDay, updateEvent);
   setPeriod(days);
+  if (event.recursive !== 'no') {
+    setIsRecEventModalOpen(true);
+  }
 };

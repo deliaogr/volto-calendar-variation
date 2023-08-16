@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Calendar from '../Calendar/Calendar';
 import { formatEventsForInterval } from '../Utils/RRuleConnector';
-import EditEventSchema from './schema';
+import { EditEventSchema, MoveRecEventSchema } from './schema';
 import { ModalForm } from '@plone/volto/components';
 import { injectIntl } from 'react-intl';
 import { flattenToAppURL } from '@plone/volto/helpers';
@@ -20,6 +20,7 @@ const CalendarVariation = ({
   const [eventsInInterval, setEventsInInterval] = useState([]);
   const [interval, setInterval] = useState();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isRecEventModalOpen, setIsRecEventModalOpen] = useState(false);
   const [formData, setFormData] = useState();
 
   useEffect(() => {
@@ -83,10 +84,13 @@ const CalendarVariation = ({
       id: eventData.id,
     };
 
-    dispatch(updateContent(path, {}, dataToSend));
+    if (!setIsRecEventModalOpen) {
+      dispatch(updateContent(path, {}, dataToSend));
+      setIsRecEventModalOpen(false);
+    }
   };
 
-  const onSubmit = (e) => {
+  const onSubmitEditEvent = (e) => {
     const event = getCurrentEventById(e.id);
     if (!event) return;
 
@@ -105,8 +109,19 @@ const CalendarVariation = ({
     dispatch(getRawContent(path));
   };
 
+  const onSubmitMoveRecEvent = (e) => {
+    // const event = getCurrentEventById(e.id);
+    console.log({ e });
+    // if (!event) return;
+
+    const dataToSend = {
+      moveEvent: e.moveEvent,
+    };
+  };
+
   const handleOnCancel = () => {
     setIsModalOpen(false);
+    setIsRecEventModalOpen(false);
   };
 
   const handleEdit = (eventId) => {
@@ -119,10 +134,21 @@ const CalendarVariation = ({
       {isModalOpen && formData && isEditMode && (
         <ModalForm
           schema={EditEventSchema(intl)}
-          onSubmit={onSubmit}
+          onSubmit={onSubmitEditEvent}
           title={'Edit event'}
           open={isModalOpen}
           formData={formData}
+          onCancel={handleOnCancel}
+          key="JSON"
+        />
+      )}
+      {isRecEventModalOpen && isEditMode && (
+        <ModalForm
+          schema={MoveRecEventSchema(intl)}
+          onSubmit={onSubmitMoveRecEvent}
+          title={'Only this event or all events in series?'}
+          open={isRecEventModalOpen}
+          // formData={formData}
           onCancel={handleOnCancel}
           key="JSON"
         />
@@ -138,6 +164,7 @@ const CalendarVariation = ({
           initial_view,
           user_select_view,
           initial_date,
+          setIsRecEventModalOpen,
         }}
       />
     </div>

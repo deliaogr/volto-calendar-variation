@@ -17,6 +17,7 @@ const Week = ({
   isEditMode,
   events = [],
   selectedPeriod: selectedWeek,
+  setIsRecEventModalOpen,
 }) => {
   const fullDayEvents = events.filter((event) => event.startHour === null);
   const hourEvents = events.filter((event) => event.startHour !== null);
@@ -117,6 +118,7 @@ const Week = ({
             setWeekHours,
             updateEvent,
             updateEventDates,
+            setIsRecEventModalOpen,
           )
         }
         enableDefaultSensors={isEditMode ? true : false}
