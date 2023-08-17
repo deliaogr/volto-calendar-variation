@@ -13,7 +13,7 @@ import { withViewSelector } from '../ViewSelector/withViewSelector';
 const Week = ({
   handleEdit,
   setInterval,
-  updateEvent,
+  handleDrop,
   isEditMode,
   events = [],
   selectedPeriod: selectedWeek,
@@ -44,7 +44,7 @@ const Week = ({
     );
   });
 
-  const updateEventDates = (event, destinationDay, updateEvent) => {
+  const updateEventData = (event, destinationDay) => {
     const daysDiff =
       new Date(event.endDate).getTime() - new Date(event.startDate).getTime();
 
@@ -73,7 +73,7 @@ const Week = ({
         ? moment(destinationDay.hour + hoursDiff, 'H').format('HH:mm')
         : null;
 
-    return updateEvent({ ...event, startDate, endDate, startHour, endHour });
+    return handleDrop({ ...event, startDate, endDate, startHour, endHour });
   };
 
   useEffect(() => {
@@ -116,8 +116,7 @@ const Week = ({
             dragResult,
             weekHours,
             setWeekHours,
-            updateEvent,
-            updateEventDates,
+            updateEventData,
             setIsRecEventModalOpen,
           )
         }

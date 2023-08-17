@@ -6,9 +6,10 @@ const viewNames = Object.keys(views);
 
 const Calendar = ({
   handleEdit,
+  handleDrop,
   setInterval,
   makeDefaultEvent,
-  updateEvent,
+  // updateEvent,
   isEditMode,
   eventsInInterval: events,
   initial_view,
@@ -29,9 +30,10 @@ const Calendar = ({
             setSelectedView,
             viewNames,
             handleEdit,
+            handleDrop,
             events,
             setInterval,
-            updateEvent,
+            // updateEvent,
             makeDefaultEvent,
             isEditMode,
             user_select_view,

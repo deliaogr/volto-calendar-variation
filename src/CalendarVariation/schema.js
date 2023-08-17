@@ -51,11 +51,8 @@ const editEventMessages = defineMessages({
 
 const getMoveEventChoices = (intl) => {
   return [
-    ['Only this event', intl.formatMessage(moveEventMessages.labelSingleEvent)],
-    [
-      'This and next events in series',
-      intl.formatMessage(moveEventMessages.labelNextEvents),
-    ],
+    ['oneEvent', intl.formatMessage(moveEventMessages.labelSingleEvent)],
+    ['multipleEvents', intl.formatMessage(moveEventMessages.labelNextEvents)],
   ];
 };
 
@@ -74,11 +71,8 @@ const MoveRecEventSchema = (intl) => {
     properties: {
       moveEvent: {
         title: intl.formatMessage(moveEventMessages.labelMoveEvent),
-        type: 'string',
-        factory: 'Choice',
         choices: moveChoices,
-        isMulti: false,
-        default: 'Only this event',
+        noValueOption: false,
       },
     },
   };

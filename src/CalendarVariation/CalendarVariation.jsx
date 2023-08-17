@@ -6,7 +6,7 @@ import { ModalForm } from '@plone/volto/components';
 import { injectIntl } from 'react-intl';
 import { flattenToAppURL } from '@plone/volto/helpers';
 import { useDispatch } from 'react-redux';
-import { getRawContent, updateContent } from './actions';
+import { updateContent } from './actions';
 
 const CalendarVariation = ({
   items,
@@ -84,10 +84,7 @@ const CalendarVariation = ({
       id: eventData.id,
     };
 
-    if (!setIsRecEventModalOpen) {
-      dispatch(updateContent(path, {}, dataToSend));
-      setIsRecEventModalOpen(false);
-    }
+    dispatch(updateContent(path, {}, dataToSend));
   };
 
   const onSubmitEditEvent = (e) => {
@@ -98,25 +95,17 @@ const CalendarVariation = ({
 
     const dataToSend = {
       title: e.title,
-      start: e.eventStarts,
-      end: e.eventEnds,
+      start: e.startDate,
+      end: e.endDate,
       id: e.id,
       whole_day: e.wholeDay,
     };
 
     dispatch(updateContent(path, {}, dataToSend));
-    setIsModalOpen(false);
-    dispatch(getRawContent(path));
   };
 
-  const onSubmitMoveRecEvent = (e) => {
-    // const event = getCurrentEventById(e.id);
-    console.log({ e });
-    // if (!event) return;
-
-    const dataToSend = {
-      moveEvent: e.moveEvent,
-    };
+  const onSubmitMoveRecEvent = (updateOption) => {
+    updateEvent(formData);
   };
 
   const handleOnCancel = () => {
@@ -127,6 +116,15 @@ const CalendarVariation = ({
   const handleEdit = (eventId) => {
     getCurrentEventById(eventId);
     setIsModalOpen(true);
+  };
+
+  const handleDrop = (event) => {
+    if (event.recursive !== 'no') {
+      setIsRecEventModalOpen(true);
+      setFormData(event);
+    } else {
+      updateEvent(event);
+    }
   };
 
   return (
@@ -148,7 +146,6 @@ const CalendarVariation = ({
           onSubmit={onSubmitMoveRecEvent}
           title={'Only this event or all events in series?'}
           open={isRecEventModalOpen}
-          // formData={formData}
           onCancel={handleOnCancel}
           key="JSON"
         />
@@ -156,9 +153,8 @@ const CalendarVariation = ({
       <Calendar
         {...{
           handleEdit,
+          handleDrop,
           setInterval,
-          getCurrentEventById,
-          updateEvent,
           isEditMode,
           eventsInInterval,
           initial_view,

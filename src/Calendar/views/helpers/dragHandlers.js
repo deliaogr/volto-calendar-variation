@@ -1,20 +1,3 @@
-// remove dragged event from source
-const removeDraggedEvent = (sourceDay, source) => {
-  return [
-    ...sourceDay.events.slice(0, source.index),
-    ...sourceDay.events.slice(source.index + 1),
-  ];
-};
-
-// add dropped event to destination at desired position
-const addDroppedEvent = (destinationDay, eventToMove, destination) => {
-  return [
-    ...destinationDay.events.slice(0, destination.index),
-    eventToMove,
-    ...destinationDay.events.slice(destination.index),
-  ];
-};
-
 /**
  * Move the event to different destination at selected position or keep it in place
  * (will not reorder if source is the same as destination)
@@ -30,14 +13,7 @@ const addDroppedEvent = (destinationDay, eventToMove, destination) => {
  * @param {Number} dragResult.source.index
  * @returns
  */
-export const onDragEnd = (
-  dragResult,
-  cells,
-  setPeriod,
-  updateEvent,
-  updateEventDates,
-  setIsRecEventModalOpen,
-) => {
+export const onDragEnd = (dragResult, cells, updateEventData) => {
   const { source, destination } = dragResult;
   // if destination is not droppable or source is the same as destination, it will be kept in place
   if (!destination || destination?.droppableId === source?.droppableId) {
@@ -48,19 +24,6 @@ export const onDragEnd = (
   const sourceDay = days[source.droppableId];
   const destinationDay = days[destination.droppableId];
   const event = sourceDay.events[source.index];
-  // replacing item in array is safe to mutate,
-  // it won't change the original source
-  days[source.droppableId] = {
-    ...sourceDay,
-    events: removeDraggedEvent(sourceDay, source),
-  };
-  days[destination.droppableId] = {
-    ...destinationDay,
-    events: addDroppedEvent(destinationDay, event, destination),
-  };
-  updateEventDates(event, destinationDay, updateEvent);
-  setPeriod(days);
-  if (event.recursive !== 'no') {
-    setIsRecEventModalOpen(true);
-  }
+
+  updateEventData(event, destinationDay);
 };

@@ -11,8 +11,8 @@ import { withViewSelector } from '../ViewSelector/withViewSelector';
 
 const Month = ({
   handleEdit,
+  handleDrop,
   setInterval,
-  updateEvent,
   isEditMode,
   events = [],
   selectedPeriod: selectedMonth,
@@ -33,7 +33,7 @@ const Month = ({
     </span>
   ));
 
-  const updateEventDates = (event, destinationDay, updateEvent) => {
+  const updateEventData = (event, destinationDay) => {
     const daysDiff =
       new Date(event.endDate).getTime() - new Date(event.startDate).getTime();
 
@@ -47,7 +47,7 @@ const Month = ({
       'YYYY-MM-DD',
     );
 
-    return updateEvent({
+    return handleDrop({
       ...event,
       startDate,
       endDate,
@@ -71,8 +71,7 @@ const Month = ({
             dragResult,
             days,
             setDays,
-            updateEvent,
-            updateEventDates,
+            updateEventData,
             setIsRecEventModalOpen,
           )
         }
