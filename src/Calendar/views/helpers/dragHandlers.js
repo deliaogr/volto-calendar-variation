@@ -19,10 +19,9 @@ export const onDragEnd = (dragResult, cells, updateEventData) => {
   if (!destination || destination?.droppableId === source?.droppableId) {
     return;
   }
-  // make copy to make it safe to mutate, the source won't be changed
-  const days = cells.slice();
-  const sourceDay = days[source.droppableId];
-  const destinationDay = days[destination.droppableId];
+
+  const sourceDay = cells[source.droppableId];
+  const destinationDay = cells[destination.droppableId];
   const event = sourceDay.events[source.index];
 
   updateEventData(event, destinationDay);

@@ -52,7 +52,10 @@ const editEventMessages = defineMessages({
 const getMoveEventChoices = (intl) => {
   return [
     ['oneEvent', intl.formatMessage(moveEventMessages.labelSingleEvent)],
-    ['multipleEvents', intl.formatMessage(moveEventMessages.labelNextEvents)],
+    [
+      'multipleEvents',
+      intl.formatMessage(moveEventMessages.labelMultipleEvents),
+    ],
   ];
 };
 
@@ -60,17 +63,17 @@ const MoveRecEventSchema = (intl) => {
   const moveChoices = getMoveEventChoices(intl);
 
   return {
-    required: ['moveEvent'],
+    required: ['updateOption'],
     fieldsets: [
       {
         id: 'default',
         title: 'default',
-        fields: ['moveEvent'],
+        fields: ['updateOption'],
       },
     ],
     properties: {
-      moveEvent: {
-        title: intl.formatMessage(moveEventMessages.labelMoveEvent),
+      updateOption: {
+        title: intl.formatMessage(moveEventMessages.labelUpdateOption),
         choices: moveChoices,
         noValueOption: false,
       },
@@ -79,7 +82,7 @@ const MoveRecEventSchema = (intl) => {
 };
 
 const moveEventMessages = defineMessages({
-  labelMoveEvent: {
+  labelUpdateOption: {
     id: 'Move event',
     defaultMessage: 'Move event',
   },
@@ -87,7 +90,7 @@ const moveEventMessages = defineMessages({
     id: 'Only this event',
     defaultMessage: 'Only this event',
   },
-  labelNextEvents: {
+  labelMultipleEvents: {
     id: 'This and next events in series',
     defaultMessage: 'This and next events in series',
   },

@@ -112,13 +112,7 @@ const Week = ({
     <div>
       <DragDropContext
         onDragEnd={(dragResult) =>
-          onDragEnd(
-            dragResult,
-            weekHours,
-            setWeekHours,
-            updateEventData,
-            setIsRecEventModalOpen,
-          )
+          onDragEnd(dragResult, weekHours, updateEventData)
         }
         enableDefaultSensors={isEditMode ? true : false}
       >

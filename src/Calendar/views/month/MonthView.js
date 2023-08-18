@@ -66,15 +66,7 @@ const Month = ({
   return (
     <div>
       <DragDropContext
-        onDragEnd={(dragResult) =>
-          onDragEnd(
-            dragResult,
-            days,
-            setDays,
-            updateEventData,
-            setIsRecEventModalOpen,
-          )
-        }
+        onDragEnd={(dragResult) => onDragEnd(dragResult, days, updateEventData)}
         enableDefaultSensors={isEditMode ? true : false}
       >
         <div className="calendar">

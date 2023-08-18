@@ -157,13 +157,14 @@ const formatRecursiveRelevantEvents = (event, interval) => {
   // recurrenceDates is an array of all dates generated using the recurrence rule
   // but only the startDate
   // we use the original event and only update the start and end dates for each recurrent event
-  return relevantRecurrenceDates.map((date) => {
+  return relevantRecurrenceDates.map((date, index) => {
     const startDate = date;
     const endDate = new Date(startDate.getTime() + eventTimeSpan);
     return {
       ...firstRecursiveEvent,
       startDate: moment(startDate).format('YYYY-MM-DD'),
       endDate: moment(endDate).format('YYYY-MM-DD'),
+      isFirstEvent: index === 0 ? true : false,
     };
   });
 };

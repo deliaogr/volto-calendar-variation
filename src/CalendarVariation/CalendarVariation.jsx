@@ -4,9 +4,44 @@ import { formatEventsForInterval } from '../Utils/RRuleConnector';
 import { EditEventSchema, MoveRecEventSchema } from './schema';
 import { ModalForm } from '@plone/volto/components';
 import { injectIntl } from 'react-intl';
-import { flattenToAppURL } from '@plone/volto/helpers';
+import { flattenToAppURL, getParentUrl } from '@plone/volto/helpers';
+import { createContent } from '@plone/volto/actions';
 import { useDispatch } from 'react-redux';
 import { updateContent } from './actions';
+
+const formatToVoltoEvent = (eventData) => {
+  let eventStartDate = new Date(eventData.startDate).toISOString();
+  let eventEndDate = new Date(eventData.endDate).toISOString();
+  let whole_day = false;
+
+  if (eventData.startHour && eventData.endHour) {
+    const [startYear, startMonth, startDay] = eventData.startDate.split('-');
+    const [startHour, startMinute] = eventData.startHour.split(':');
+    const [endYear, endMonth, endDay] = eventData.endDate.split('-');
+    const [endHour, endMinute] = eventData.endHour.split(':');
+
+    const combinedStartDate = new Date(
+      startYear,
+      startMonth - 1,
+      startDay,
+      startHour,
+      startMinute,
+    ).toISOString();
+    const combinedEndDate = new Date(
+      endYear,
+      endMonth - 1,
+      endDay,
+      endHour,
+      endMinute,
+    ).toISOString();
+
+    eventStartDate = combinedStartDate;
+    eventEndDate = combinedEndDate;
+  } else {
+    whole_day = true;
+  }
+  return { eventStartDate, eventEndDate, whole_day };
+};
 
 const CalendarVariation = ({
   items,
@@ -49,39 +84,16 @@ const CalendarVariation = ({
     if (!event) return;
     const path = flattenToAppURL(event['@id']);
 
-    let eventStartDate = new Date(eventData.startDate).toISOString();
-    let eventEndDate = new Date(eventData.endDate).toISOString();
-
-    if (eventData.startHour && eventData.endHour) {
-      const [startYear, startMonth, startDay] = eventData.startDate.split('-');
-      const [startHour, startMinute] = eventData.startHour.split(':');
-      const [endYear, endMonth, endDay] = eventData.endDate.split('-');
-      const [endHour, endMinute] = eventData.endHour.split(':');
-
-      const combinedStartDate = new Date(
-        startYear,
-        startMonth - 1,
-        startDay,
-        startHour,
-        startMinute,
-      ).toISOString();
-      const combinedEndDate = new Date(
-        endYear,
-        endMonth - 1,
-        endDay,
-        endHour,
-        endMinute,
-      ).toISOString();
-
-      eventStartDate = combinedStartDate;
-      eventEndDate = combinedEndDate;
-    }
+    const { eventStartDate, eventEndDate, whole_day } = formatToVoltoEvent(
+      eventData,
+    );
 
     const dataToSend = {
       title: eventData.title,
       start: eventStartDate,
       end: eventEndDate,
       id: eventData.id,
+      whole_day: whole_day,
     };
 
     dispatch(updateContent(path, {}, dataToSend));
@@ -104,8 +116,30 @@ const CalendarVariation = ({
     dispatch(updateContent(path, {}, dataToSend));
   };
 
-  const onSubmitMoveRecEvent = (updateOption) => {
-    updateEvent(formData);
+  const onSubmitMoveRecEvent = ({ updateOption }) => {
+    if (updateOption === 'multipleEvents' && formData.isFirstEvent) {
+      updateEvent(formData);
+    } else {
+      const event = getCurrentEventById(formData.id);
+      if (!event) return;
+      const path = getParentUrl(event['@id']);
+
+      const { eventStartDate, eventEndDate, whole_day } = formatToVoltoEvent(
+        formData,
+      );
+
+      const extra = Math.random().toString().slice(0, 5);
+
+      const eventData = {
+        title: formData.title,
+        start: eventStartDate,
+        end: eventEndDate,
+        id: formData.id + extra,
+        whole_day: whole_day,
+      };
+
+      dispatch(createContent(path, { ...eventData, '@type': 'Event' }));
+    }
   };
 
   const handleOnCancel = () => {
