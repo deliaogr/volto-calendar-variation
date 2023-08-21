@@ -89,6 +89,42 @@ const isRelevant = (event, interval) => {
   return isRelevant;
 };
 
+const updateRRule = (rrule, eventStartDate) => {
+  return new RRule({
+    ...rrule.options,
+    dtstart: eventStartDate,
+    byhour: rrule.options.byhour?.length ? [eventStartDate.getHours()] : [],
+    byminute: rrule.options.byminute?.length
+      ? [eventStartDate.getMinutes()]
+      : [],
+    bymonth: rrule.options.bymonth?.length
+      ? [eventStartDate.getMonth() + 1]
+      : [],
+    bymonthday: rrule.options.bymonthday?.length
+      ? [eventStartDate.getDate()]
+      : [],
+    bynmonthday: rrule.options.bynthmonthday?.length
+      ? [eventStartDate.getDate()]
+      : [],
+    bynweekday: rrule.options.bynthweekday?.length
+      ? [eventStartDate.getDay() === 0 ? 6 : eventStartDate.getDay() - 1]
+      : [],
+    bysecond: rrule.options.bysecond?.length
+      ? [eventStartDate.getSeconds()]
+      : [],
+    bysetpos: rrule.options.bysetpos?.length ? [eventStartDate.getDate()] : [],
+    byweekday: rrule.options.byweekday?.length
+      ? [eventStartDate.getDay() === 0 ? 6 : eventStartDate.getDay() - 1]
+      : [],
+    byweekno: rrule.options.byweekno?.length
+      ? [getWeekNumber(eventStartDate)]
+      : [],
+    byyearday: rrule.options.byyearday?.length
+      ? [getDayOfYear(eventStartDate)]
+      : [],
+  });
+};
+
 const formatRecursiveRelevantEvents = (event, interval) => {
   const rruleSet = rrulestr(event.recurrence);
   const isRRuleSet = rruleSet instanceof RRuleSet;
@@ -97,45 +133,11 @@ const formatRecursiveRelevantEvents = (event, interval) => {
 
   const clonedRRuleSet = new RRuleSet();
   if (isRRule && !isRRuleSet) {
-    clonedRRuleSet.rrule(rruleSet);
+    const clonedRRule = updateRRule(rruleSet, eventStartDate);
+    clonedRRuleSet.rrule(clonedRRule);
   } else if (isRRuleSet) {
     rruleSet.rrules().forEach((rrule) => {
-      const clonedRRule = new RRule({
-        ...rrule.options,
-        dtstart: eventStartDate,
-        byhour: rrule.options.byhour?.length ? [eventStartDate.getHours()] : [],
-        byminute: rrule.options.byminute?.length
-          ? [eventStartDate.getMinutes()]
-          : [],
-        bymonth: rrule.options.bymonth?.length
-          ? [eventStartDate.getMonth() + 1]
-          : [],
-        bymonthday: rrule.options.bymonthday?.length
-          ? [eventStartDate.getDate()]
-          : [],
-        bynmonthday: rrule.options.bynthmonthday?.length
-          ? [eventStartDate.getDate()]
-          : [],
-        bynweekday: rrule.options.bynthweekday?.length
-          ? [eventStartDate.getDay() === 0 ? 6 : eventStartDate.getDay() - 1]
-          : [],
-        bysecond: rrule.options.bysecond?.length
-          ? [eventStartDate.getSeconds()]
-          : [],
-        bysetpos: rrule.options.bysetpos?.length
-          ? [eventStartDate.getDate()]
-          : [],
-        byweekday: rrule.options.byweekday?.length
-          ? [eventStartDate.getDay() === 0 ? 6 : eventStartDate.getDay() - 1]
-          : [],
-        byweekno: rrule.options.byweekno?.length
-          ? [getWeekNumber(eventStartDate)]
-          : [],
-        byyearday: rrule.options.byyearday?.length
-          ? [getDayOfYear(eventStartDate)]
-          : [],
-      });
-
+      const clonedRRule = updateRRule(rrule, eventStartDate);
       clonedRRuleSet.rrule(clonedRRule);
     });
   }
@@ -186,4 +188,27 @@ export const formatEventsForInterval = (events = [], interval) => {
       : formatRecursiveRelevantEvents(currentEvent, interval);
     return [...acc, ...result];
   }, []);
+};
+
+export const addExceptionDate = (event, date) => {
+  const rruleSet = rrulestr(event.recurrence);
+  const isRRuleSet = rruleSet instanceof RRuleSet;
+  const isRRule = rruleSet instanceof RRule;
+
+  const clonedRRuleSet = new RRuleSet();
+  if (isRRule && !isRRuleSet) {
+    const clonedRRule = new RRule({
+      ...rruleSet.options,
+      exdate: date,
+    });
+    clonedRRuleSet.rrule(clonedRRule);
+  } else if (isRRuleSet) {
+    rruleSet.rrules().forEach((rrule) => {
+      const clonedRRule = new RRule({
+        ...rrule.options,
+        exdate: date,
+      });
+      clonedRRuleSet.rrule(clonedRRule);
+    });
+  }
 };
