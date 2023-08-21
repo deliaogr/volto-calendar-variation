@@ -91,48 +91,54 @@ const isRelevant = (event, interval) => {
 
 const formatRecursiveRelevantEvents = (event, interval) => {
   const rruleSet = rrulestr(event.recurrence);
+  const isRRuleSet = rruleSet instanceof RRuleSet;
+  const isRRule = rruleSet instanceof RRule;
   const eventStartDate = new Date(event.start);
 
-  const clonedRuleSet = new RRuleSet();
-  rruleSet.rrules().forEach((rrule) => {
-    const clonedRule = new RRule({
-      ...rrule.options,
-      dtstart: eventStartDate,
-      byhour: rrule.options.byhour?.length ? [eventStartDate.getHours()] : [],
-      byminute: rrule.options.byminute?.length
-        ? [eventStartDate.getMinutes()]
-        : [],
-      bymonth: rrule.options.bymonth?.length
-        ? [eventStartDate.getMonth() + 1]
-        : [],
-      bymonthday: rrule.options.bymonthday?.length
-        ? [eventStartDate.getDate()]
-        : [],
-      bynmonthday: rrule.options.bynthmonthday?.length
-        ? [eventStartDate.getDate()]
-        : [],
-      bynweekday: rrule.options.bynthweekday?.length
-        ? [eventStartDate.getDay() === 0 ? 6 : eventStartDate.getDay() - 1]
-        : [],
-      bysecond: rrule.options.bysecond?.length
-        ? [eventStartDate.getSeconds()]
-        : [],
-      bysetpos: rrule.options.bysetpos?.length
-        ? [eventStartDate.getDate()]
-        : [],
-      byweekday: rrule.options.byweekday?.length
-        ? [eventStartDate.getDay() === 0 ? 6 : eventStartDate.getDay() - 1]
-        : [],
-      byweekno: rrule.options.byweekno?.length
-        ? [getWeekNumber(eventStartDate)]
-        : [],
-      byyearday: rrule.options.byyearday?.length
-        ? [getDayOfYear(eventStartDate)]
-        : [],
-    });
+  const clonedRRuleSet = new RRuleSet();
+  if (isRRule && !isRRuleSet) {
+    clonedRRuleSet.rrule(rruleSet);
+  } else if (isRRuleSet) {
+    rruleSet.rrules().forEach((rrule) => {
+      const clonedRRule = new RRule({
+        ...rrule.options,
+        dtstart: eventStartDate,
+        byhour: rrule.options.byhour?.length ? [eventStartDate.getHours()] : [],
+        byminute: rrule.options.byminute?.length
+          ? [eventStartDate.getMinutes()]
+          : [],
+        bymonth: rrule.options.bymonth?.length
+          ? [eventStartDate.getMonth() + 1]
+          : [],
+        bymonthday: rrule.options.bymonthday?.length
+          ? [eventStartDate.getDate()]
+          : [],
+        bynmonthday: rrule.options.bynthmonthday?.length
+          ? [eventStartDate.getDate()]
+          : [],
+        bynweekday: rrule.options.bynthweekday?.length
+          ? [eventStartDate.getDay() === 0 ? 6 : eventStartDate.getDay() - 1]
+          : [],
+        bysecond: rrule.options.bysecond?.length
+          ? [eventStartDate.getSeconds()]
+          : [],
+        bysetpos: rrule.options.bysetpos?.length
+          ? [eventStartDate.getDate()]
+          : [],
+        byweekday: rrule.options.byweekday?.length
+          ? [eventStartDate.getDay() === 0 ? 6 : eventStartDate.getDay() - 1]
+          : [],
+        byweekno: rrule.options.byweekno?.length
+          ? [getWeekNumber(eventStartDate)]
+          : [],
+        byyearday: rrule.options.byyearday?.length
+          ? [getDayOfYear(eventStartDate)]
+          : [],
+      });
 
-    clonedRuleSet.rrule(clonedRule);
-  });
+      clonedRRuleSet.rrule(clonedRRule);
+    });
+  }
 
   const firstRecursiveEvent = {
     ...makeDefaultEvent(event),
@@ -143,7 +149,7 @@ const formatRecursiveRelevantEvents = (event, interval) => {
     new Date(firstRecursiveEvent.endDate).getTime() -
     new Date(firstRecursiveEvent.startDate).getTime();
 
-  const allRecurrenceDates = clonedRuleSet.all();
+  const allRecurrenceDates = clonedRRuleSet.all();
 
   const relevantRecurrenceDates = allRecurrenceDates.filter((date) =>
     isRelevant(
