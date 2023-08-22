@@ -33,7 +33,7 @@ const Month = ({
     </span>
   ));
 
-  const updateEventData = (event, destinationDay) => {
+  const updateEventData = (event, destinationDay, sourceDay) => {
     const daysDiff =
       new Date(event.endDate).getTime() - new Date(event.startDate).getTime();
 
@@ -47,11 +47,14 @@ const Month = ({
       'YYYY-MM-DD',
     );
 
-    return handleDrop({
-      ...event,
-      startDate,
-      endDate,
-    });
+    return handleDrop(
+      {
+        ...event,
+        startDate,
+        endDate,
+      },
+      sourceDay,
+    );
   };
 
   useEffect(() => {

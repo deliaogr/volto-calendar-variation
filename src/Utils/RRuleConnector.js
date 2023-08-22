@@ -172,7 +172,7 @@ const formatRecursiveRelevantEvents = (event, interval) => {
       ...firstRecursiveEvent,
       startDate: moment(startDate).format('YYYY-MM-DD'),
       endDate: moment(endDate).format('YYYY-MM-DD'),
-      isFirstEvent: index === 0 ? true : false,
+      recurrenceIndex: index,
     };
   });
 };
@@ -192,23 +192,10 @@ export const formatEventsForInterval = (events = [], interval) => {
 
 export const addExceptionDate = (event, date) => {
   const rruleSet = rrulestr(event.recurrence);
-  const isRRuleSet = rruleSet instanceof RRuleSet;
-  const isRRule = rruleSet instanceof RRule;
-
-  const clonedRRuleSet = new RRuleSet();
-  if (isRRule && !isRRuleSet) {
-    const clonedRRule = new RRule({
-      ...rruleSet.options,
-      exdate: date,
-    });
-    clonedRRuleSet.rrule(clonedRRule);
-  } else if (isRRuleSet) {
-    rruleSet.rrules().forEach((rrule) => {
-      const clonedRRule = new RRule({
-        ...rrule.options,
-        exdate: date,
-      });
-      clonedRRuleSet.rrule(clonedRRule);
-    });
-  }
+  rruleSet.exdate(date);
+  console.log({ rruleSet });
+  return {
+    ...event,
+    recurrence: rruleSet.toString(),
+  };
 };

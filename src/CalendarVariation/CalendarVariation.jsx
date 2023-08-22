@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import Calendar from '../Calendar/Calendar';
-import { formatEventsForInterval } from '../Utils/RRuleConnector';
+import {
+  addExceptionDate,
+  formatEventsForInterval,
+} from '../Utils/RRuleConnector';
 import { EditEventSchema, MoveRecEventSchema } from './schema';
 import { ModalForm } from '@plone/volto/components';
 import { injectIntl } from 'react-intl';
 import { flattenToAppURL, getParentUrl } from '@plone/volto/helpers';
-import { createContent } from '@plone/volto/actions';
+// import { createContent, getContent } from '@plone/volto/actions';
 import { useDispatch } from 'react-redux';
-import { updateContent } from './actions';
+import { updateContent, createContent } from './actions';
 
 const formatToVoltoEvent = (eventData) => {
   let eventStartDate = new Date(eventData.startDate).toISOString();
@@ -117,9 +120,12 @@ const CalendarVariation = ({
   };
 
   const onSubmitMoveRecEvent = ({ updateOption }) => {
-    if (updateOption === 'multipleEvents' && formData.isFirstEvent) {
-      updateEvent(formData);
-    } else {
+    if (updateOption === 'multipleEvents') {
+      if (formData.recurrenceIndex === 0) {
+        updateEvent(formData);
+      }
+    } else if (updateOption === 'oneEvent') {
+      const exDate = formData.exDate;
       const event = getCurrentEventById(formData.id);
       if (!event) return;
       const path = getParentUrl(event['@id']);
@@ -127,6 +133,9 @@ const CalendarVariation = ({
       const { eventStartDate, eventEndDate, whole_day } = formatToVoltoEvent(
         formData,
       );
+      const updatedInitialEvent = addExceptionDate(event, exDate);
+
+      console.log({ updatedInitialEvent });
 
       const extra = Math.random().toString().slice(0, 5);
 
@@ -138,7 +147,9 @@ const CalendarVariation = ({
         whole_day: whole_day,
       };
 
-      dispatch(createContent(path, { ...eventData, '@type': 'Event' }));
+      dispatch(createContent(path, {}, { ...eventData, '@type': 'Event' }));
+      // setIsRecEventModalOpen(false);
+      // window.location.reload();
     }
   };
 
@@ -147,15 +158,22 @@ const CalendarVariation = ({
     setIsRecEventModalOpen(false);
   };
 
-  const handleEdit = (eventId) => {
-    getCurrentEventById(eventId);
+  const handleEdit = (eventId, date) => {
+    getCurrentEventById(eventId, date);
     setIsModalOpen(true);
   };
 
-  const handleDrop = (event) => {
+  const handleDrop = (event, sourceDay) => {
     if (event.recursive !== 'no') {
       setIsRecEventModalOpen(true);
-      setFormData(event);
+      setFormData({
+        ...event,
+        exDate: new Date(
+          sourceDay.year,
+          sourceDay.month - 1,
+          sourceDay.dayNumber,
+        ),
+      });
     } else {
       updateEvent(event);
     }

@@ -24,5 +24,5 @@ export const onDragEnd = (dragResult, cells, updateEventData) => {
   const destinationDay = cells[destination.droppableId];
   const event = sourceDay.events[source.index];
 
-  updateEventData(event, destinationDay);
+  updateEventData(event, destinationDay, sourceDay);
 };
