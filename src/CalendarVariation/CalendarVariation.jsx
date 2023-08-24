@@ -3,6 +3,7 @@ import Calendar from '../Calendar/Calendar';
 import {
   addExceptionDate,
   formatEventsForInterval,
+  updateEndDate,
 } from '../Utils/RRuleConnector';
 import { EditEventSchema, MoveRecEventSchema } from './schema';
 import { ModalForm } from '@plone/volto/components';
@@ -97,6 +98,7 @@ const CalendarVariation = ({
       end: eventEndDate,
       id: eventData.id,
       whole_day: whole_day,
+      exDate: eventData.exDate || null,
     };
 
     dispatch(updateContent(path, {}, dataToSend));
@@ -120,26 +122,37 @@ const CalendarVariation = ({
   };
 
   const onSubmitMoveRecEvent = ({ updateOption }) => {
+    const event = getCurrentEventById(formData.id);
+    if (!event) return;
     if (updateOption === 'multipleEvents') {
       if (formData.recurrenceIndex === 0) {
         updateEvent(formData);
+      } else {
+        const updatedEndDate = updateEndDate(event, formData.exDate);
+        console.log(event.recurrence, { updatedEndDate });
       }
     } else if (updateOption === 'oneEvent') {
+      const newPath = getParentUrl(event['@id']);
       const exDate = formData.exDate;
-      const event = getCurrentEventById(formData.id);
-      if (!event) return;
-      const path = getParentUrl(event['@id']);
 
       const { eventStartDate, eventEndDate, whole_day } = formatToVoltoEvent(
         formData,
       );
       const updatedInitialEvent = addExceptionDate(event, exDate);
 
-      console.log({ updatedInitialEvent });
-
       const extra = Math.random().toString().slice(0, 5);
 
-      const eventData = {
+      const initialPath = flattenToAppURL(updatedInitialEvent['@id']);
+      const initialEventData = {
+        title: updatedInitialEvent.title,
+        start: updatedInitialEvent.start,
+        end: updatedInitialEvent.end,
+        id: updatedInitialEvent.id,
+        whole_day: updatedInitialEvent.whole_day,
+        recurrence: updatedInitialEvent.recurrence,
+      };
+
+      const newEventData = {
         title: formData.title,
         start: eventStartDate,
         end: eventEndDate,
@@ -147,7 +160,10 @@ const CalendarVariation = ({
         whole_day: whole_day,
       };
 
-      dispatch(createContent(path, {}, { ...eventData, '@type': 'Event' }));
+      dispatch(
+        createContent(newPath, {}, { ...newEventData, '@type': 'Event' }),
+      );
+      dispatch(updateContent(initialPath, {}, initialEventData));
       // setIsRecEventModalOpen(false);
       // window.location.reload();
     }
@@ -159,7 +175,7 @@ const CalendarVariation = ({
   };
 
   const handleEdit = (eventId, date) => {
-    getCurrentEventById(eventId, date);
+    getCurrentEventById(eventId);
     setIsModalOpen(true);
   };
 
