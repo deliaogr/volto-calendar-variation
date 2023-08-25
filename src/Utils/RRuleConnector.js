@@ -90,9 +90,12 @@ const isRelevant = (event, interval) => {
 };
 
 const updateRRule = (rrule, eventStartDate) => {
+  // const rrule = rrulestr(event.recurrence);
+
   return new RRule({
     ...rrule.options,
     dtstart: eventStartDate,
+    // until: rrule.options.until ? newUntil : null,
     byhour: rrule.options.byhour?.length ? [eventStartDate.getHours()] : [],
     byminute: rrule.options.byminute?.length
       ? [eventStartDate.getMinutes()]
@@ -130,6 +133,7 @@ const formatRecursiveRelevantEvents = (event, interval) => {
   const isRRuleSet = rruleSet instanceof RRuleSet;
   const eventStartDate = new Date(event.start);
 
+  // TODO: remove clone
   const clonedRRuleSet = new RRuleSet();
   if (!isRRuleSet) {
     const clonedRRule = updateRRule(rruleSet, eventStartDate);
@@ -223,22 +227,64 @@ export const addExceptionDate = (event, date) => {
   }
 };
 
-export const updateEndDate = (event, date) => {
-  const rrule = rrulestr(event.recurrence);
-  const originalOptions = rrule.origOptions;
-  const timeDelta = date.getTime() - rrule.origOptions.dtstart.getTime();
+const calculateCount = (event, rrule, recurrenceEndDate) => {
+  let startDate = new Date(event.start);
+  const recurrenceDates = rrule.between(startDate, recurrenceEndDate, true);
 
-  if (originalOptions.until) {
-    const newUntilDate = new Date(originalOptions.until.getTime() + timeDelta);
-    rrule.options.until = newUntilDate;
-  } else if (originalOptions.count) {
-    const newCount = Math.ceil(timeDelta / originalOptions.interval);
-    rrule.options.count = newCount;
+  return recurrenceDates.length + 1;
+};
+
+export const updateRecurrenceEnd = (event, date) => {
+  let rruleSet = rrulestr(event.recurrence);
+  const isRRuleSet = rruleSet instanceof RRuleSet;
+
+  if (!isRRuleSet) {
+    if (rruleSet.options.until) {
+      rruleSet = new RRule({
+        ...rruleSet.options,
+        until: date,
+      });
+    } else {
+      const newCount = calculateCount(event, rruleSet, date);
+      rruleSet = new RRule({
+        ...rruleSet.options,
+        count: newCount,
+      });
+    }
   } else {
-    rrule.options.until = date;
+    rruleSet.rrules().forEach((rrule) => {
+      if (rrule.options.until) {
+        rrule = new RRule({
+          ...rrule.options,
+          until: date,
+        });
+      } else {
+        const newCount = calculateCount(event, rruleSet, date);
+        rrule = new RRule({
+          ...rrule.options,
+          count: newCount,
+        });
+      }
+    });
   }
 
-  const updatedRecurrence = rrule.toString();
+  return rruleSet.toString();
+};
 
-  return updatedRecurrence;
+export const updateRecurrenceStart = (event, date) => {
+  const startDate = new Date(date);
+  let rruleSet = rrulestr(event.recurrence);
+  const isRRuleSet = rruleSet instanceof RRuleSet;
+
+  if (!isRRuleSet) {
+    rruleSet = updateRRule(rruleSet, startDate);
+  } else {
+    rruleSet.rrules().forEach((rrule) => {
+      rrule = updateRRule(rrule, startDate);
+    });
+  }
+
+  console.log(rruleSet.all());
+
+  return rruleSet.toString();
 };

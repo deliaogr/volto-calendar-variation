@@ -3,7 +3,8 @@ import Calendar from '../Calendar/Calendar';
 import {
   addExceptionDate,
   formatEventsForInterval,
-  updateEndDate,
+  updateRecurrenceEnd,
+  updateRecurrenceStart,
 } from '../Utils/RRuleConnector';
 import { EditEventSchema, MoveRecEventSchema } from './schema';
 import { ModalForm } from '@plone/volto/components';
@@ -77,6 +78,7 @@ const CalendarVariation = ({
         eventEnds: event.end,
         id: event.id,
         wholeDay: event.whole_day,
+        recurrence: event.recurrence,
       });
     }
 
@@ -128,10 +130,33 @@ const CalendarVariation = ({
       if (formData.recurrenceIndex === 0) {
         updateEvent(formData);
       } else {
-        const updatedEndDate = updateEndDate(event, formData.exDate);
-        console.log(event.recurrence, { updatedEndDate });
+        const path = flattenToAppURL(event['@id']);
+        const newPath = getParentUrl(event['@id']);
+        const exDate = formData.exDate;
+        const updatedRecurrence = updateRecurrenceEnd(event, exDate);
+
+        const { eventStartDate, eventEndDate, whole_day } = formatToVoltoEvent(
+          formData,
+        );
+        const extra = Math.random().toString().slice(0, 5);
+
+        const newEventData = {
+          title: formData.title,
+          start: eventStartDate,
+          end: eventEndDate,
+          id: formData.id + extra,
+          whole_day: whole_day,
+          // recurrence: updateRecurrenceStart(event, formData.startDate),
+        };
+
+        dispatch(
+          createContent(newPath, {}, { ...newEventData, '@type': 'Event' }),
+        );
+        dispatch(
+          updateContent(path, {}, { ...event, recurrence: updatedRecurrence }),
+        );
       }
-    } else if (updateOption === 'oneEvent') {
+    } else {
       const newPath = getParentUrl(event['@id']);
       const exDate = formData.exDate;
 
@@ -139,18 +164,9 @@ const CalendarVariation = ({
         formData,
       );
       const updatedInitialEvent = addExceptionDate(event, exDate);
+      const initialPath = flattenToAppURL(updatedInitialEvent['@id']);
 
       const extra = Math.random().toString().slice(0, 5);
-
-      const initialPath = flattenToAppURL(updatedInitialEvent['@id']);
-      const initialEventData = {
-        title: updatedInitialEvent.title,
-        start: updatedInitialEvent.start,
-        end: updatedInitialEvent.end,
-        id: updatedInitialEvent.id,
-        whole_day: updatedInitialEvent.whole_day,
-        recurrence: updatedInitialEvent.recurrence,
-      };
 
       const newEventData = {
         title: formData.title,
@@ -163,7 +179,7 @@ const CalendarVariation = ({
       dispatch(
         createContent(newPath, {}, { ...newEventData, '@type': 'Event' }),
       );
-      dispatch(updateContent(initialPath, {}, initialEventData));
+      dispatch(updateContent(initialPath, {}, updatedInitialEvent));
       // setIsRecEventModalOpen(false);
       // window.location.reload();
     }
@@ -174,7 +190,7 @@ const CalendarVariation = ({
     setIsRecEventModalOpen(false);
   };
 
-  const handleEdit = (eventId, date) => {
+  const handleEdit = (eventId) => {
     getCurrentEventById(eventId);
     setIsModalOpen(true);
   };
