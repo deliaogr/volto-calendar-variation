@@ -146,7 +146,7 @@ const CalendarVariation = ({
           end: eventEndDate,
           id: formData.id + extra,
           whole_day: whole_day,
-          // recurrence: updateRecurrenceStart(event, formData.startDate),
+          recurrence: updateRecurrenceStart(event, formData.exDate),
         };
 
         dispatch(

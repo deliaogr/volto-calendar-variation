@@ -90,12 +90,9 @@ const isRelevant = (event, interval) => {
 };
 
 const updateRRule = (rrule, eventStartDate) => {
-  // const rrule = rrulestr(event.recurrence);
-
   return new RRule({
     ...rrule.options,
     dtstart: eventStartDate,
-    // until: rrule.options.until ? newUntil : null,
     byhour: rrule.options.byhour?.length ? [eventStartDate.getHours()] : [],
     byminute: rrule.options.byminute?.length
       ? [eventStartDate.getMinutes()]
@@ -129,19 +126,15 @@ const updateRRule = (rrule, eventStartDate) => {
 };
 
 const formatRecursiveRelevantEvents = (event, interval) => {
-  const rruleSet = rrulestr(event.recurrence);
+  let rruleSet = rrulestr(event.recurrence);
   const isRRuleSet = rruleSet instanceof RRuleSet;
   const eventStartDate = new Date(event.start);
 
-  // TODO: remove clone
-  const clonedRRuleSet = new RRuleSet();
   if (!isRRuleSet) {
-    const clonedRRule = updateRRule(rruleSet, eventStartDate);
-    clonedRRuleSet.rrule(clonedRRule);
+    rruleSet = updateRRule(rruleSet, eventStartDate);
   } else {
     rruleSet.rrules().forEach((rrule) => {
-      const clonedRRule = updateRRule(rrule, eventStartDate);
-      clonedRRuleSet.rrule(clonedRRule);
+      rruleSet = updateRRule(rrule, eventStartDate);
     });
   }
 
@@ -156,10 +149,10 @@ const formatRecursiveRelevantEvents = (event, interval) => {
 
   const exDates = rruleSet._exdate || [];
   exDates.forEach((exDate) => {
-    clonedRRuleSet.exdate(exDate);
+    rruleSet.exdate(exDate);
   });
 
-  const allRecurrenceDates = clonedRRuleSet.all().filter((date) => {
+  const allRecurrenceDates = rruleSet.all().filter((date) => {
     const shouldIncludeDate = exDates.every((exDate) => {
       const normalizedExDate = new Date(exDate);
       normalizedExDate.setHours(0, 0, 0, 0);
@@ -168,6 +161,16 @@ const formatRecursiveRelevantEvents = (event, interval) => {
     });
     return shouldIncludeDate;
   });
+
+  if (rruleSet.options.until) {
+    const untilDate = new Date(rruleSet.options.until);
+    untilDate.setHours(0, 0, 0, 0);
+    const isUntilValidOccurrence =
+      rruleSet.between(eventStartDate, untilDate).length > 0;
+    if (isUntilValidOccurrence) {
+      allRecurrenceDates.push(untilDate);
+    }
+  }
 
   const relevantRecurrenceDates = allRecurrenceDates.filter((date) =>
     isRelevant(
@@ -181,7 +184,7 @@ const formatRecursiveRelevantEvents = (event, interval) => {
   // recurrenceDates is an array of all dates generated using the recurrence rule
   // but only the startDate
   // we use the original event and only update the start and end dates for each recurrent event
-  const recurrenceDates = relevantRecurrenceDates.map((date, index) => {
+  return relevantRecurrenceDates.map((date, index) => {
     const startDate = date;
     const endDate = new Date(startDate.getTime() + eventTimeSpan);
     return {
@@ -191,7 +194,6 @@ const formatRecursiveRelevantEvents = (event, interval) => {
       recurrenceIndex: index,
     };
   });
-  return recurrenceDates;
 };
 
 const formatDefaultRelevantEvent = (event, interval) => {
@@ -227,25 +229,29 @@ export const addExceptionDate = (event, date) => {
   }
 };
 
-const calculateCount = (event, rrule, recurrenceEndDate) => {
-  let startDate = new Date(event.start);
+const calculateCount = (startDate, rrule, recurrenceEndDate) => {
+  startDate.setHours(0, 0, 0, 0);
+  recurrenceEndDate.setHours(23, 59, 59, 999);
   const recurrenceDates = rrule.between(startDate, recurrenceEndDate, true);
 
-  return recurrenceDates.length + 1;
+  return recurrenceDates.length;
 };
 
 export const updateRecurrenceEnd = (event, date) => {
+  let startDate = new Date(event.start);
   let rruleSet = rrulestr(event.recurrence);
+  const endDate = new Date(date);
+  endDate.setDate(date.getDate() - 1);
   const isRRuleSet = rruleSet instanceof RRuleSet;
 
   if (!isRRuleSet) {
     if (rruleSet.options.until) {
       rruleSet = new RRule({
         ...rruleSet.options,
-        until: date,
+        until: endDate,
       });
     } else {
-      const newCount = calculateCount(event, rruleSet, date);
+      const newCount = calculateCount(startDate, rruleSet, date);
       rruleSet = new RRule({
         ...rruleSet.options,
         count: newCount,
@@ -256,10 +262,10 @@ export const updateRecurrenceEnd = (event, date) => {
       if (rrule.options.until) {
         rrule = new RRule({
           ...rrule.options,
-          until: date,
+          until: endDate,
         });
       } else {
-        const newCount = calculateCount(event, rruleSet, date);
+        const newCount = calculateCount(startDate, rruleSet, date);
         rrule = new RRule({
           ...rrule.options,
           count: newCount,
@@ -274,17 +280,31 @@ export const updateRecurrenceEnd = (event, date) => {
 export const updateRecurrenceStart = (event, date) => {
   const startDate = new Date(date);
   let rruleSet = rrulestr(event.recurrence);
+  const calculatedCount = calculateCount(
+    startDate,
+    rruleSet,
+    rruleSet.options.until,
+  );
+
   const isRRuleSet = rruleSet instanceof RRuleSet;
 
   if (!isRRuleSet) {
     rruleSet = updateRRule(rruleSet, startDate);
+    rruleSet = new RRule({
+      ...rruleSet.options,
+      count: calculatedCount,
+      until: null,
+    });
   } else {
     rruleSet.rrules().forEach((rrule) => {
       rrule = updateRRule(rrule, startDate);
+      rruleSet = new RRule({
+        ...rruleSet.options,
+        count: calculatedCount,
+        until: null,
+      });
     });
   }
-
-  console.log(rruleSet.all());
 
   return rruleSet.toString();
 };
