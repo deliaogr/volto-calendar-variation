@@ -180,8 +180,6 @@ const CalendarVariation = ({
         createContent(newPath, {}, { ...newEventData, '@type': 'Event' }),
       );
       dispatch(updateContent(initialPath, {}, updatedInitialEvent));
-      // setIsRecEventModalOpen(false);
-      // window.location.reload();
     }
   };
 

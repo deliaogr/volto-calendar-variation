@@ -93,10 +93,10 @@ const updateRRule = (rrule, eventStartDate) => {
   return new RRule({
     ...rrule.options,
     dtstart: eventStartDate,
-    byhour: rrule.options.byhour?.length ? [eventStartDate.getHours()] : [],
+    byhour: rrule.options.byhour?.length ? [eventStartDate.getHours()] : null,
     byminute: rrule.options.byminute?.length
       ? [eventStartDate.getMinutes()]
-      : [],
+      : null,
     bymonth: rrule.options.bymonth?.length
       ? [eventStartDate.getMonth() + 1]
       : [],
@@ -111,7 +111,7 @@ const updateRRule = (rrule, eventStartDate) => {
       : [],
     bysecond: rrule.options.bysecond?.length
       ? [eventStartDate.getSeconds()]
-      : [],
+      : null,
     bysetpos: rrule.options.bysetpos?.length ? [eventStartDate.getDate()] : [],
     byweekday: rrule.options.byweekday?.length
       ? [eventStartDate.getDay() === 0 ? 6 : eventStartDate.getDay() - 1]
@@ -130,6 +130,11 @@ const formatRecursiveRelevantEvents = (event, interval) => {
   const isRRuleSet = rruleSet instanceof RRuleSet;
   const eventStartDate = new Date(event.start);
 
+  const exDates = rruleSet._exdate || [];
+  exDates.forEach((exDate) => {
+    rruleSet.exdate(exDate);
+  });
+
   if (!isRRuleSet) {
     rruleSet = updateRRule(rruleSet, eventStartDate);
   } else {
@@ -147,11 +152,6 @@ const formatRecursiveRelevantEvents = (event, interval) => {
     new Date(firstRecursiveEvent.endDate).getTime() -
     new Date(firstRecursiveEvent.startDate).getTime();
 
-  const exDates = rruleSet._exdate || [];
-  exDates.forEach((exDate) => {
-    rruleSet.exdate(exDate);
-  });
-
   const allRecurrenceDates = rruleSet.all().filter((date) => {
     const shouldIncludeDate = exDates.every((exDate) => {
       const normalizedExDate = new Date(exDate);
@@ -161,16 +161,6 @@ const formatRecursiveRelevantEvents = (event, interval) => {
     });
     return shouldIncludeDate;
   });
-
-  if (rruleSet.options.until) {
-    const untilDate = new Date(rruleSet.options.until);
-    untilDate.setHours(0, 0, 0, 0);
-    const isUntilValidOccurrence =
-      rruleSet.between(eventStartDate, untilDate).length > 0;
-    if (isUntilValidOccurrence) {
-      allRecurrenceDates.push(untilDate);
-    }
-  }
 
   const relevantRecurrenceDates = allRecurrenceDates.filter((date) =>
     isRelevant(
@@ -211,17 +201,18 @@ export const formatEventsForInterval = (events = [], interval) => {
 
 export const addExceptionDate = (event, date) => {
   const rrule = rrulestr(event.recurrence);
+  const exDate = new Date(date);
   const isRRuleSet = rrule instanceof RRuleSet;
   if (!isRRuleSet) {
     const rruleSet = new RRuleSet();
     rruleSet.rrule(rrule);
-    rruleSet.exdate(date);
+    rruleSet.exdate(exDate);
     return {
       ...event,
       recurrence: rruleSet.toString(),
     };
   } else {
-    rrule.exdate(date);
+    rrule.exdate(exDate);
     return {
       ...event,
       recurrence: rrule.toString(),
@@ -229,62 +220,50 @@ export const addExceptionDate = (event, date) => {
   }
 };
 
-const calculateCount = (startDate, rrule, recurrenceEndDate) => {
-  startDate.setHours(0, 0, 0, 0);
-  recurrenceEndDate.setHours(23, 59, 59, 999);
-  const recurrenceDates = rrule.between(startDate, recurrenceEndDate, true);
-
-  return recurrenceDates.length;
-};
-
 export const updateRecurrenceEnd = (event, date) => {
-  let startDate = new Date(event.start);
   let rruleSet = rrulestr(event.recurrence);
   const endDate = new Date(date);
   endDate.setDate(date.getDate() - 1);
+  endDate.setHours(23, 59, 59, 999);
   const isRRuleSet = rruleSet instanceof RRuleSet;
 
   if (!isRRuleSet) {
-    if (rruleSet.options.until) {
-      rruleSet = new RRule({
-        ...rruleSet.options,
-        until: endDate,
-      });
-    } else {
-      const newCount = calculateCount(startDate, rruleSet, date);
-      rruleSet = new RRule({
-        ...rruleSet.options,
-        count: newCount,
-      });
-    }
+    rruleSet = new RRule({
+      ...rruleSet.options,
+      until: endDate,
+      count: null,
+    });
   } else {
     rruleSet.rrules().forEach((rrule) => {
-      if (rrule.options.until) {
-        rrule = new RRule({
-          ...rrule.options,
-          until: endDate,
-        });
-      } else {
-        const newCount = calculateCount(startDate, rruleSet, date);
-        rrule = new RRule({
-          ...rrule.options,
-          count: newCount,
-        });
-      }
+      rrule = new RRule({
+        ...rrule.options,
+        until: endDate,
+        count: null,
+      });
     });
   }
 
   return rruleSet.toString();
 };
 
+const calculateCountIfUntil = (startDate, recurrenceEndDate, rrule) => {
+  return rrule.between(startDate, recurrenceEndDate).length;
+};
+
+const calculateCountIfCount = (eventStartDate, newStartDate, rrule) => {
+  const initialCount = rrule.all().length;
+  const newCount = rrule.between(eventStartDate, newStartDate, true).length;
+  return newCount > 1 ? initialCount - newCount + 1 : initialCount - 1;
+};
+
 export const updateRecurrenceStart = (event, date) => {
-  const startDate = new Date(date);
   let rruleSet = rrulestr(event.recurrence);
-  const calculatedCount = calculateCount(
-    startDate,
-    rruleSet,
-    rruleSet.options.until,
-  );
+  const eventStartDate = new Date(event.start);
+  const startDate = new Date(date);
+  const until = new Date(rruleSet.options.until);
+  const count = rruleSet.options.until
+    ? calculateCountIfUntil(startDate, until, rruleSet)
+    : calculateCountIfCount(eventStartDate, startDate, rruleSet);
 
   const isRRuleSet = rruleSet instanceof RRuleSet;
 
@@ -292,7 +271,7 @@ export const updateRecurrenceStart = (event, date) => {
     rruleSet = updateRRule(rruleSet, startDate);
     rruleSet = new RRule({
       ...rruleSet.options,
-      count: calculatedCount,
+      count: count,
       until: null,
     });
   } else {
@@ -300,7 +279,7 @@ export const updateRecurrenceStart = (event, date) => {
       rrule = updateRRule(rrule, startDate);
       rruleSet = new RRule({
         ...rruleSet.options,
-        count: calculatedCount,
+        count: count,
         until: null,
       });
     });
