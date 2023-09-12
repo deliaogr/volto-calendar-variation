@@ -22,26 +22,24 @@ const Calendar = ({
   const View = views[selectedView];
 
   return (
-    <div>
-      <div className="calendar-container">
-        <View
-          {...{
-            selectedView,
-            setSelectedView,
-            viewNames,
-            handleEdit,
-            handleDrop,
-            events,
-            setInterval,
-            // updateEvent,
-            makeDefaultEvent,
-            isEditMode,
-            user_select_view,
-            initial_date,
-            setIsRecEventModalOpen,
-          }}
-        />
-      </div>
+    <div className="calendar-container">
+      <View
+        {...{
+          selectedView,
+          setSelectedView,
+          viewNames,
+          handleEdit,
+          handleDrop,
+          events,
+          setInterval,
+          // updateEvent,
+          makeDefaultEvent,
+          isEditMode,
+          user_select_view,
+          initial_date,
+          setIsRecEventModalOpen,
+        }}
+      />
     </div>
   );
 };

@@ -164,7 +164,7 @@ const CalendarVariation = ({
         formData,
       );
       const updatedInitialEvent = addExceptionDate(event, exDate);
-      const initialPath = flattenToAppURL(updatedInitialEvent['@id']);
+      const path = flattenToAppURL(updatedInitialEvent['@id']);
 
       const extra = Math.random().toString().slice(0, 5);
 
@@ -179,7 +179,7 @@ const CalendarVariation = ({
       dispatch(
         createContent(newPath, {}, { ...newEventData, '@type': 'Event' }),
       );
-      dispatch(updateContent(initialPath, {}, updatedInitialEvent));
+      dispatch(updateContent(path, {}, updatedInitialEvent));
     }
   };
 
@@ -210,7 +210,7 @@ const CalendarVariation = ({
   };
 
   return (
-    <div>
+    <>
       {isModalOpen && formData && isEditMode && (
         <ModalForm
           schema={EditEventSchema(intl)}
@@ -245,7 +245,7 @@ const CalendarVariation = ({
           setIsRecEventModalOpen,
         }}
       />
-    </div>
+    </>
   );
 };
 
